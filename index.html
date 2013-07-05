@@ -2,29 +2,47 @@
 <html>
 <meta charset="utf-8">
 <body>
-<div id="edit" class="large"></div>
+<div id="top" class="top">
+  <span>Browser Module Sandbox</span>
+  <a href="" class="topcoat-button--cta run">Run</a>
+</div>
+<div id="edit" class="left"></div>
+<div id="output" class="right"></div>
 <script src="browser-module-sandbox.js"></script>
 <script src="javascript-editor.js"></script>
 <link rel="stylesheet" type="text/css" href="codemirror.css"/>
-<style>
-  body { margin:0; padding:0; }
-  .large { position: absolute; top: 50px; left: 0; right: 0; bottom: 0; }
-</style>
+<link rel="stylesheet" type="text/css" href="style.css"/>
 <script>
 var createSandbox = require('browser-module-sandbox')
 var jsEditor = require('javascript-editor')
 var editorEl = document.querySelector('#edit')
+var output = document.querySelector('#output')
+var runButton = document.querySelector('.run')
+
+runButton.addEventListener('click', function(e) {
+  e.preventDefault()
+  output.innerHTML = ""
+  run()
+  return false
+})
 
 var editor = jsEditor({
   container: editorEl,
   lineWrapping: true
 })
 
+editor.setValue("var changeCase = require('change-case')\nvar cameled = changeCase.camelCase('hello there')\ndocument.body.innerHTML = cameled")
+
 function run() {
   var program = editor.editor.getValue()
-  var sandbox = createSandbox()
+  var sandbox = createSandbox({ cdn: 'http://wzrd.in', container: output })
+  sandbox.on('bundleStart', hideRun)
+  sandbox.on('bundleEnd', showRun)
   sandbox.bundle(program)
 }
+
+function hideRun() { runButton.style.display = 'none' }
+function showRun() { runButton.style.display = 'inline-block' }
 
 </script>
 </body>
