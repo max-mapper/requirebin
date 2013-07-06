@@ -17,7 +17,10 @@
     "browser-module-sandbox": "1.1.0",
     "github-oauth": "0.0.4",
     "concat-stream": "1.0.0",
-    "browser-request": "0.2.0"
+    "browser-request": "0.2.0",
+    "toolbar": "0.0.5",
+    "xmlhttprequest": "1.6.0",
+    "underscore": "1.5.0"
   },
   "engines": {
     "node": ">=0.8.x"
