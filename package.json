@@ -1,10 +1,10 @@
 {
   "name": "requirebin",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "create programs in the browser using modules from NPM",
   "scripts": {
     "start": "beefy embed.js:embed-bundle.js index.js:bundle.js 8080",
-    "build": "browserify embed.js -o embed-bundle.js && browserify index.js -o bundle.js"
+    "build": "browserify embed.js -o embed-bundle.js && browserify index.js -o bundle.js --debug"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,6 @@
     "node": ">=0.8.x"
   },
   "devDependencies": {
-    "browserify": "~1.18.0"
+    "browserify": "~2.23.1"
   }
 }

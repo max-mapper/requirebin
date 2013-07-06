@@ -13,7 +13,7 @@ both can be hosted anywhere, the instances used by requirebin.com are hosted on 
 ## getting it to run locally
 
 - set up browserify-cdn and/or gatekeeper servers
-- edit `config.json`
+- edit `config.js`
 
 ```
 npm install
