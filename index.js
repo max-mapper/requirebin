@@ -74,7 +74,7 @@ loadCode(function(err, code) {
   editor.setValue(code)
   
   var sandbox = createSandbox({
-    cdn: 'http://wzrd.in',
+    cdn: config.BROWSERIFYCDN,
     container: outputEl
   })
 
