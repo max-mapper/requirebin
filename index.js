@@ -1,3 +1,5 @@
+var config = require('./config')
+
 var elementClass = require('element-class')
 var toolbar = require('toolbar')
 var jsEditor = require('javascript-editor')
@@ -6,15 +8,21 @@ var qs = require('querystring')
 var url = require('url')
 var request = require('browser-request')
 var jsonp = require('jsonp')
-var cookie = require('cookie')
-var cookies = cookie.parse(document.cookie)
+
+var cookie = require('./cookie')
+var Github = require('./github/github')
+
+window.github = new Github({
+  token: cookie.get('oauth-token'),
+  auth: 'oauth'
+})
+
 var loggedIn = false
-if (cookies && cookies['user-id']) loggedIn = true
+if (cookie.get('oauth-token')) loggedIn = true
 
 var parsedURL = url.parse(window.location.href, true)
-var gistID = parsedURL.path.match(/^\/(\d+)$/)
-if (gistID) {
-  gistID = gistID[1]
+if (parsedURL.query.gist) {
+  var gistID = parsedURL.query.gist
   enableShare(gistID)
 }
 
@@ -71,6 +79,7 @@ loadCode(function(err, code) {
   })
 
   if (parsedURL.query.save) return saveGist(gistID)
+  if (parsedURL.query.code) return authenticate()
 
   var howTo = document.querySelector('#howto')
   var share = document.querySelector('#share')
@@ -99,7 +108,7 @@ loadCode(function(err, code) {
     if (action in actions) actions[action]()
     target.siblings().removeClass("active")
     target.addClass("active")
-  });
+  })
   
   var actions = {
     play: function() {
@@ -122,7 +131,11 @@ loadCode(function(err, code) {
     save: function() {
       if (loggedIn) return saveGist(gistID)
       loadingClass.remove('hidden')
-      window.location.href = "/login"
+      var loginURL = "https://github.com/login/oauth/authorize" + 
+        "?client_id=" + config.GITHUB_CLIENT +
+        "&scope=repo, user, gist" +
+        "&redirect_uri=" + window.location.href
+      window.location.href = loginURL
     },
 
     howto: function() {
@@ -135,7 +148,27 @@ loadCode(function(err, code) {
       elementClass(share).remove('hidden')
     }
   }
-
+  
+  function authenticate() {
+    if (cookie.get('oauth-token')) return loggedIn = true
+    var match = window.location.href.match(/\?code=([a-z0-9]*)/)
+    
+    // Handle Code
+    if (!match) return false
+    var authURL = config.GATEKEEPER + '/authenticate/' + match[1]
+    request({url: authURL, json: true}, function (err, resp, data) {
+      if (err) return console.err(err)
+      console.log('resp', resp, data)
+      cookie.set('oauth-token', data.token)
+      loggedIn = true
+      // Adjust URL
+      var regex = new RegExp("\\?code=" + match[1])
+      window.location.href = window.location.href.replace(regex, '').replace('&state=', '') + '?save=true'
+    })
+    
+    return true
+  }
+  
   sandbox.on('bundleStart', function() {
     crosshair.style.display = 'block'
     crosshairClass.add('spinning')
@@ -161,18 +194,26 @@ loadCode(function(err, code) {
     var entry = editor.editor.getValue()
     sandbox.bundle(entry)
     sandbox.once('bundleEnd', function(bundle) {
-      var saveURL = '/save'
-      if (id) saveURL = saveURL += '/' + id
       loadingClass.remove('hidden')
-      var body = {
-        entry: entry,
-        head: bundle.head,
-        script: bundle.script
+      var gist = {
+       "description": "made with requirebin.com",
+         "public": true,
+         "files": {
+           "index.js": {
+             "content": entry
+           },
+           "minified.js": {
+             "content": bundle.script
+           },
+           "head.html": {
+             "content": bundle.head
+           }
+         }
       }
-      request({url: saveURL, method: "POST", body: body, json: true}, function(err, resp, json) {
+      github.getGist().create(gist, function(err, data) {
         loadingClass.add('hidden')
-        if (json.error) return alert(JSON.stringify(json.error))
-        window.location.href = "/" + json.id
+        if (err) return alert(JSON.stringify(err))
+        window.location.href = "/?gist=" + data.id
       })
     })
   }
