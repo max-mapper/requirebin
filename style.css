@@ -10,6 +10,7 @@
 body {
   font: 300 14px "Helvetica Neue", Helvetica, Arial;
 }
+a { cursor: pointer; cursor: hand; }
 #header {
   background: white;
   position: fixed;
@@ -88,6 +89,24 @@ body > pre { display: none }
 .right { background: #eee; }
 /* codemirror */
 .CodeMirror { font-size:12px; }
+
+.npm {
+  background: url(npm.png);
+  width: 38px;
+  height: 15px;
+  display: inline-block;
+  position: relative;
+  top: 4px;
+}
+
+.view-icon {
+  background: url(view.png);
+  width: 28px;
+  height: 20px;
+  display: inline-block;
+  position: relative;
+  top: 5px;
+}
 
 
 #editor .CodeMirror .errorLine { background: rgba(255,0,0,0.25); }
