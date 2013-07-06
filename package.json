@@ -3,7 +3,8 @@
   "version": "0.0.2",
   "description": "create programs in the browser using modules from NPM",
   "scripts": {
-    "start": "beefy embed.js:embed-bundle.js index.js:bundle.js 8080"
+    "start": "beefy embed.js:embed-bundle.js index.js:bundle.js 8080",
+    "build": "browserify embed.js -o embed-bundle.js && browserify index.js -o bundle.js"
   },
   "repository": {
     "type": "git",
@@ -14,10 +15,11 @@
     "jsonp": "0.0.3",
     "javascript-editor": "0.1.0",
     "uglify-js": "2.2.3",
-    "browser-module-sandbox": "1.1.0",
+    "browser-module-sandbox": "1.2.0",
     "github-oauth": "0.0.4",
     "concat-stream": "1.0.0",
-    "browser-request": "0.2.0"
+    "browser-request": "0.2.0",
+    "github": "git://github.com/michael/github.git"
   },
   "engines": {
     "node": ">=0.8.x"

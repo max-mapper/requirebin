@@ -10,7 +10,7 @@ var request = require('browser-request')
 var jsonp = require('jsonp')
 
 var cookie = require('./cookie')
-var Github = require('./github/github')
+var Github = require('github')
 
 window.github = new Github({
   token: cookie.get('oauth-token'),
