@@ -1,0 +1,139 @@
+@font-face {
+
+	font-family: CenturySchoolbookMono;
+	src: url('Century-Schoolbook-Monospace-BT.ttf');
+	font-weight: normal;
+	font-style: normal;
+
+}
+
+body {
+  font: 300 14px "Helvetica Neue", Helvetica, Arial;
+}
+#header {
+  background: white;
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  height: 50px;
+  left: 0;
+  right: 0;
+  border-bottom: 1px solid black;
+  overflow: hidden;
+}
+#header .controls {
+  float: right;
+}
+.actionsMenu { width: 224px; float: right; margin: 5px 10px; }
+.actionsButtons { margin: 5px 10px; float: right; }
+.large {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.hidden { visibility: hidden; display: none; }
+.loading { margin: 9px 0; position: absolute; left: 400px; z-index: 5; overflow: auto; width: 120px; }
+.loading * { float: left; line-height: 32px;}
+.loading img { margin-right: 10px }
+
+.btn-toolbar .btn {
+  padding-top: 9px !important;
+}
+
+#edit, #play { z-index: 1; border-top: 1px solid #eee; }
+
+#edit .CodeMirror {
+
+	height: 100%;
+	font-size: 16px;
+	background-color: rgba(255,255,255,0.75);
+	-webkit-transform: translateZ(0); /* Workaround for OSX antialias issue */
+
+}
+
+#edit .CodeMirror-scroll {
+
+	height: 100%;
+
+}
+
+#edit .CodeMirror div.CodeMirror-selected {
+
+	background: rgba(0,0,0,0.1);
+
+}
+
+#edit .CodeMirror-focused div.CodeMirror-selected {
+
+	background: rgba(0,0,255,0.1);
+
+}
+
+#edit .CodeMirror .errorLine {
+
+	background: rgba(255,0,0,0.25);
+
+}
+
+body { margin: 0; padding: 0; }
+
+html, body, #editor { height: 100%; }
+
+/* mysterious pre */
+body > pre { display: none } 
+
+.left, .right { height: 100%; overflow: visible; display: block; float: left; position: relative; width: 50%; }
+.right { background: #eee; }
+/* codemirror */
+.CodeMirror { font-size:14px; }
+
+
+#editor .CodeMirror .errorLine { background: rgba(255,0,0,0.25); }
+
+#play { overflow: hidden }
+#shareTextarea { font-size: 12px; }
+#shareInstructions p { margin: 5px 0; }
+
+#howto, #share, .packagejson { padding: 20px; float: right; width: 30%; overflow: auto; border-left: 1px solid #eee; border-bottom: 1px solid #eee; }
+.packagejson { clear: both; }
+.packagejson h4 { margin-top: -3px; margin-bottom: 15px; }
+#howto ul { list-style-type: none; }
+#howto p { margin-bottom: 10px }
+.logo { padding: 0px 6px 0 1px; margin-top: 5px; float: left; background-size: 40px 200px; width: 200px; }
+.attribution { margin: 20px 0 0 0; float: left; font-size: 12px; }
+#controls { width: 50%; top: 0; right: 0; left: initial;}
+#container {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin: -2px 0 0 -2px;
+  width: 4px;
+  height: 4px;
+  background-color: #d00;
+  opacity: 0.5;
+}
+
+#stats { bottom: 0px; right: 0px; }
+.errorMessage { text-align: center; width: 200px; margin: 20px auto; }
+
+@-webkit-keyframes rotate{
+	from{
+		-webkit-transform:rotate(0deg) translate(-9px) rotate(0deg);
+	}
+	to{
+		-webkit-transform:rotate(360deg) translate(-9px) rotate(-360deg);
+	}
+}
+
+.spinning {
+	-webkit-animation:rotate infinite linear;
+	-webkit-animation-duration:.5s;
+	-webkit-animation-delay:.1s;
+}

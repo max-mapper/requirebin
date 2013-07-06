@@ -1,0 +1,35 @@
+{
+  "name": "requirebin",
+  "version": "0.0.1",
+  "description": "create programs in the browser using modules from NPM",
+  "scripts": {
+    "start": "node server.js",
+    "build": "browserify www/embed.js -o www/embed-bundle.js && browserify www/index.js -o www/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:maxogden/requirebin.git"
+  },
+  "dependencies": {
+    "browserify": "~1.18.0",
+    "element-class": "0.0.2",
+    "ecstatic": "0.3.2",
+    "jsonp": "0.0.3",
+    "filed": "0.0.7",
+    "javascript-editor": "0.1.0",
+    "cookie": "0.0.5",
+    "uglify-js": "2.2.3",
+    "browser-module-sandbox": "1.1.0",
+    "github-oauth": "0.0.4",
+    "concat-stream": "1.0.0",
+    "hat": "0.0.3",
+    "request": "2.12.0",
+    "browser-request": "0.2.0"
+  },
+  "engines": {
+    "node": ">=0.10.x"
+  },
+  "devDependencies": {
+    "browserify": "~1.18.0"
+  }
+}

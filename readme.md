@@ -1,8 +1,7 @@
-## loads modules from npm automatically
+# requirebin
 
-try writing a cool program using some cool modules!
+create programs in the browser using modules from NPM
 
-uses a hosted [browserify-cdn](https://github.com/jesusabdullah/browserify-cdn) and these modules:
+## license
 
-- [browser-module-sandbox](https://github.com/maxogden/browser-module-sandbox)
-- [javascript-editor](https://github.com/maxogden/javascript-editor)
+BSD
