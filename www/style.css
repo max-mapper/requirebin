@@ -87,7 +87,7 @@ body > pre { display: none }
 .left, .right { height: 100%; overflow: visible; display: block; float: left; position: relative; width: 50%; }
 .right { background: #eee; }
 /* codemirror */
-.CodeMirror { font-size:14px; }
+.CodeMirror { font-size:12px; }
 
 
 #editor .CodeMirror .errorLine { background: rgba(255,0,0,0.25); }

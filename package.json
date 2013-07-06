@@ -1,6 +1,11 @@
 {
   "name": "requirebin",
-  "version": "0.0.1",
+  "subdomain": "requirebin",
+  "domains": [
+    "requirebin.com",
+    "www.requirebin.com"
+  ],
+  "version": "0.0.1-1",
   "description": "create programs in the browser using modules from NPM",
   "scripts": {
     "start": "node server.js",
@@ -27,7 +32,7 @@
     "browser-request": "0.2.0"
   },
   "engines": {
-    "node": ">=0.10.x"
+    "node": ">=0.8.x"
   },
   "devDependencies": {
     "browserify": "~1.18.0"
