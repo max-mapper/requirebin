@@ -38,7 +38,7 @@ function enableShare(gistID) {
   var disabled = document.querySelector('#shareDisabled')
   elementClass(disabled).add('hidden')
   elementClass(instructions).remove('hidden')
-  textarea.value = '<iframe width="560" height="315" src="' + window.location.origin + '/play/' + gistID + '" frameborder="0" allowfullscreen></iframe>'
+  textarea.value = '<iframe width="560" height="315" src="' + window.location.origin + '/embed?gist=' + gistID + '" frameborder="0" allowfullscreen></iframe>'
 }
 
 function loadCode(cb) {
