@@ -8,6 +8,7 @@ var qs = require('querystring')
 var url = require('url')
 var request = require('browser-request')
 var jsonp = require('jsonp')
+var detective = require('detective')
 
 var cookie = require('./cookie')
 var Github = require('github-api')
@@ -88,8 +89,20 @@ loadCode(function(err, code) {
   var controlsContainer = document.querySelector('#controls')
   var textBox = document.querySelector("#shareTextarea")
 
-  // Tags Input
-  $(".tagsinput").tagsInput()
+  var packageTags = $(".tagsinput")
+  
+  editor.on('valid', function(valid) {
+    if (!valid) return
+    packageTags.html('')
+    var modules = detective(editor.editor.getValue())
+    modules.map(function(module) {
+      var tag = 
+        '<span class="tag"><a target="_blank" href="http://npmjs.org/' +
+          module + '"><span>' + module + '&nbsp;&nbsp;</span></a></span>'
+      packageTags.append(tag)
+    })
+    if (modules.length === 0) packageTags.append('<div class="tagsinput-add">No Modules Required Yet</div>')
+  })
 
   var actionsMenu = $(".actionsMenu")
   actionsMenu.dropkick({

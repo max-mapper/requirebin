@@ -13,13 +13,14 @@
   "dependencies": {
     "element-class": "0.0.2",
     "jsonp": "0.0.3",
-    "javascript-editor": "0.1.0",
+    "javascript-editor": "0.2.0",
     "uglify-js": "2.2.3",
     "browser-module-sandbox": "1.2.0",
     "github-oauth": "0.0.4",
     "concat-stream": "1.0.0",
     "browser-request": "0.2.0",
-    "github-api": "0.7.0"
+    "github-api": "0.7.0",
+    "detective": "~2.1.2"
   },
   "engines": {
     "node": ">=0.8.x"
