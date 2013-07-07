@@ -27,7 +27,7 @@ a { cursor: pointer; cursor: hand; }
   bottom: 0;
 }
 .hidden { visibility: hidden; display: none; }
-.loading { margin: 9px 0; position: absolute; left: 400px; z-index: 5; overflow: auto; width: 120px; }
+.loading { margin: 10px 0; position: absolute; left: 210px; z-index: 5; overflow: auto; width: 120px; }
 .loading * { float: left; line-height: 32px;}
 .loading img { margin-right: 10px }
 

@@ -6,9 +6,17 @@ var gistID = parsedURL.query.gist
 
 jsonp('https://api.github.com/gists/' + gistID, function(err, gist) {
   if (err) return console.log(err)
-  var head = gist.data.files['head.html'].content
-  var minified = gist.data.files['minified.js'].content
-  document.head.innerHTML += head
+  var files = gist.data.files
+  
+  var headFile = files['page-head.html']
+  if (!headFile) headFile = files['head.html']
+  if (headFile) var head = headFile.content
+  if (head) document.head.innerHTML += head
+  
+  var minFile = files['minified.js']
+  if (minFile) var minified = minFile.content
+  else var minified = "document.body.innerHTML += 'not a valid requirebin gist - missing minified.js'"
+  
   _eval = eval
   _eval(minified)
 })

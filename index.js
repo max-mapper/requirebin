@@ -208,6 +208,7 @@ loadCode(function(err, code) {
     sandbox.bundle(entry)
     sandbox.once('bundleEnd', function(bundle) {
       loadingClass.remove('hidden')
+      var minified = UglifyJS.minify(bundle.script)
       var gist = {
        "description": "made with requirebin.com",
          "public": true,
@@ -216,9 +217,9 @@ loadCode(function(err, code) {
              "content": entry
            },
            "minified.js": {
-             "content": bundle.script
+             "content": minified
            },
-           "head.html": {
+           "page-head.html": {
              "content": bundle.head
            }
          }
