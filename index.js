@@ -63,7 +63,7 @@ function loadCode(cb) {
 
 loadCode(function(err, code) {
   if (err) return alert(JSON.stringify(err))
-    
+  
   var editor = jsEditor({
     container: editorEl,
     lineWrapping: true
@@ -71,7 +71,7 @@ loadCode(function(err, code) {
   
   window.editor = editor
   
-  editor.setValue(code)
+  if (code) editor.setValue(code)
   
   var sandbox = createSandbox({
     cdn: config.BROWSERIFYCDN,
