@@ -76,7 +76,8 @@ loadCode(function(err, code) {
   
   var sandbox = createSandbox({
     cdn: config.BROWSERIFYCDN,
-    container: outputEl
+    container: outputEl,
+    iframeStyle: "body, html { height: 100%; width: 100%; }"
   })
 
   if (parsedURL.query.save) return saveGist(gistID)
