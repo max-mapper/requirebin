@@ -1,7 +1,6 @@
 var config = require('./config')
 
 var elementClass = require('element-class')
-var toolbar = require('toolbar')
 var jsEditor = require('javascript-editor')
 var createSandbox = require('browser-module-sandbox')
 var qs = require('querystring')
