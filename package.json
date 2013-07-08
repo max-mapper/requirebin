@@ -1,6 +1,6 @@
 {
   "name": "requirebin",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "create programs in the browser using modules from NPM",
   "scripts": {
     "start": "beefy embed.js:embed-bundle.js index.js:bundle.js 8080",
@@ -15,7 +15,7 @@
     "jsonp": "0.0.3",
     "javascript-editor": "0.2.0",
     "uglify-js": "2.2.3",
-    "browser-module-sandbox": "~1.2.1",
+    "browser-module-sandbox": "~1.3.0",
     "github-oauth": "0.0.4",
     "concat-stream": "1.0.0",
     "browser-request": "0.2.0",

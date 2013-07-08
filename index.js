@@ -231,7 +231,7 @@ loadCode(function(err, code) {
       loadingClass.remove('hidden')
       var minified = UglifyJS.minify(bundle.script)
       var gist = {
-       "description": "made with requirebin.com",
+       "description": "requirebin sketch",
          "public": opts.isPublic,
          "files": {
            "index.js": {
@@ -242,7 +242,13 @@ loadCode(function(err, code) {
            },
            "page-head.html": {
              "content": bundle.head
-           }
+           },
+           "requirebin.md": {
+             "content": "view on [requirebin](http://requirebin.com?gist=" + id + ")"
+           }// ,
+           // "package.json": {
+           //   "content": JSON.stringify(packagejson)
+           // }
          }
       }
       github.getGist().create(gist, function(err, data) {
