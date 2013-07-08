@@ -79,7 +79,9 @@ loadCode(function(err, code) {
     iframeStyle: "body, html { height: 100%; width: 100%; }"
   })
 
-  if (parsedURL.query.save) return saveGist(gistID)
+  if (parsedURL.query.save) return saveGist(gistID, {
+    'isPublic': !parsedURL.query['private']
+  })
   if (parsedURL.query.code) return authenticate()
 
   var howTo = document.querySelector('#howto')
@@ -151,6 +153,22 @@ loadCode(function(err, code) {
       window.location.href = loginURL
     },
 
+    'save-private': function() {
+      if (loggedIn) return saveGist(gistID, { 'isPublic': false })
+      loadingClass.remove('hidden')
+
+      var target = window.location.href
+      target += target.indexOf('?') === -1 ? '%3F' : '%26'
+      target += 'private=true'
+
+      var loginURL = "https://github.com/login/oauth/authorize" +
+        "?client_id=" + config.GITHUB_CLIENT +
+        "&scope=repo, user, gist" +
+        "&redirect_uri=" + target
+
+      window.location.href = loginURL
+    },
+
     howto: function() {
       elementClass(howTo).remove('hidden')
       elementClass(share).add('hidden')
@@ -203,15 +221,18 @@ loadCode(function(err, code) {
     })
   }
   
-  function saveGist(id) {
+  function saveGist(id, opts) {
     var entry = editor.editor.getValue()
+    opts = opts || {}
+    opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
+
     sandbox.bundle(entry)
     sandbox.once('bundleEnd', function(bundle) {
       loadingClass.remove('hidden')
       var minified = UglifyJS.minify(bundle.script)
       var gist = {
        "description": "made with requirebin.com",
-         "public": true,
+         "public": opts.isPublic,
          "files": {
            "index.js": {
              "content": entry
