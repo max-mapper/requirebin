@@ -56,10 +56,10 @@ function loadCode(cb) {
       cb(false, json.files['index.js'].content)
     })
   }
-  
+
   var stored = localStorage.getItem('code')
   if (stored) return cb(false, stored)
-  
+
   // todo read from template/file/server
   var defaultGame = document.querySelector('#template').innerText
   cb(false, defaultGame)
@@ -67,16 +67,16 @@ function loadCode(cb) {
 
 loadCode(function(err, code) {
   if (err) return alert(JSON.stringify(err))
-  
+
   var editor = jsEditor({
     container: editorEl,
     lineWrapping: true
   })
-  
+
   window.editor = editor
-  
+
   if (code) editor.setValue(code)
-  
+
   var sandbox = createSandbox({
     cdn: config.BROWSERIFYCDN,
     container: outputEl,
@@ -96,13 +96,13 @@ loadCode(function(err, code) {
   var textBox = document.querySelector("#shareTextarea")
 
   var packageTags = $(".tagsinput")
-  
+
   editor.on('valid', function(valid) {
     if (!valid) return
     packageTags.html('')
     var modules = detective(editor.editor.getValue())
     modules.map(function(module) {
-      var tag = 
+      var tag =
         '<span class="tag"><a target="_blank" href="http://npmjs.org/' +
           module + '"><span>' + module + '&nbsp;&nbsp;</span></a></span>'
       packageTags.append(tag)
@@ -120,7 +120,7 @@ loadCode(function(err, code) {
       }, 0)
     }
   })
-  
+
   $(".actionsButtons a").click(function() {
     var target = $(this)
     var action = target.attr('data-action')
@@ -128,7 +128,7 @@ loadCode(function(err, code) {
     target.siblings().removeClass("active")
     target.addClass("active")
   })
-  
+
   var actions = {
     play: function() {
       elementClass(howTo).add('hidden')
@@ -150,7 +150,7 @@ loadCode(function(err, code) {
     save: function() {
       if (loggedIn) return saveGist(gistID)
       loadingClass.remove('hidden')
-      var loginURL = "https://github.com/login/oauth/authorize" + 
+      var loginURL = "https://github.com/login/oauth/authorize" +
         "?client_id=" + config.GITHUB_CLIENT +
         "&scope=repo, user, gist" +
         "&redirect_uri=" + window.location.href
@@ -183,11 +183,11 @@ loadCode(function(err, code) {
       elementClass(share).remove('hidden')
     }
   }
-  
+
   function authenticate() {
     if (cookie.get('oauth-token')) return loggedIn = true
     var match = window.location.href.match(/\?code=([a-z0-9]*)/)
-    
+
     // Handle Code
     if (!match) return false
     var authURL = config.GATEKEEPER + '/authenticate/' + match[1]
@@ -200,38 +200,38 @@ loadCode(function(err, code) {
       var regex = new RegExp("\\?code=" + match[1])
       window.location.href = window.location.href.replace(regex, '').replace('&state=', '') + '?save=true'
     })
-    
+
     return true
   }
-  
+
   sandbox.on('bundleStart', function() {
     crosshair.style.display = 'block'
     crosshairClass.add('spinning')
   })
-  
+
   sandbox.on('bundleEnd', function(bundle) {
     crosshairClass.remove('spinning')
     crosshair.style.display = 'none'
   })
-  
+
   sandbox.on('modules', function(modules) {
     // TODO show package.json editor
   })
-  
+
   if (!gistID) {
     editor.on("change", function() {
       var code = editor.editor.getValue()
       localStorage.setItem('code', code)
     })
   }
-  
+
   function saveGist(id, opts) {
     var entry = editor.editor.getValue()
     opts = opts || {}
     opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
 
     sandbox.bundle(entry)
-    sandbox.once('bundleEnd', function(bundle) {
+    sandbox.on('bundleEnd', function(bundle) {
       loadingClass.remove('hidden')
       var minified = UglifyJS.minify(bundle.script)
       var gist = {
@@ -255,11 +255,36 @@ loadCode(function(err, code) {
            // }
          }
       }
-      github.getGist().create(gist, function(err, data) {
-        loadingClass.add('hidden')
-        if (err) return alert(JSON.stringify(err))
-        window.location.href = "/?gist=" + data.id
-      })
+      github.getGist(id).read(function (err) {
+        if (err) {
+          if (err.error === 404) {
+            github.getGist().create(gist, function(err, data) {
+              loadingClass.add('hidden')
+              if (err) return alert(JSON.stringify(err))
+              window.location.href = "/?gist=" + data.id
+            })
+          } else {
+            return alert(JSON.stringify(err));
+          }
+        }
+        github.getGist(id).update(gist, function (err, data) {
+          if (err) {
+            if (err.error === 404) {
+              github.getGist(id).fork(function (err, data) {
+                if (err) return alert(JSON.stringify(err))
+                github.getGist(data.id).update(gist, function (err, data) {
+                  loadingClass.add('hidden')
+                  if (err) return alert(JSON.stringify(err))
+                  window.location.href = "/?gist=" + data.id
+                })
+              });
+            } else {
+              return alert(JSON.stringify(err));
+            }
+          }
+        })
+      });
     })
   }
 })
+
