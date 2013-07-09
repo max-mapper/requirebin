@@ -212,6 +212,8 @@ loadCode(function(err, code) {
   sandbox.on('bundleEnd', function(bundle) {
     crosshairClass.remove('spinning')
     crosshair.style.display = 'none'
+    if (!bundle)
+      tooltipMessage('error', 'There was an issue loading the modules')
   })
   
   sandbox.on('modules', function(modules) {
@@ -263,3 +265,31 @@ loadCode(function(err, code) {
     })
   }
 })
+
+/*
+  display error/warning messages in the site header
+  cssClass should be a default bootstrap class
+  .warning .alert .info .success
+  text is the message content
+*/
+function tooltipMessage(cssClass, text) {
+  var message = document.querySelector('.alert')
+  if (message) {
+    message.classList.remove('hidden')
+    message.classList.add('alert-'+cssClass)
+    message.innerHTML = text
+  } else {
+    message = document.createElement('div')
+    message.classList.add('alert')
+    var close = document.createElement('span')
+    close.classList.add('pull-right')
+    close.innerHTML = '&times;'
+    close.addEventListener('click', function () {
+      this.parentNode.classList.add('hidden')
+    }, false)
+    message.classList.add('alert-'+cssClass)
+    message.innerHTML = text
+    document.querySelector('body').appendChild(message)
+    message.appendChild(close)
+  }
+}
