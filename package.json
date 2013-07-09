@@ -26,6 +26,7 @@
     "node": ">=0.8.x"
   },
   "devDependencies": {
-    "browserify": "~2.23.1"
+    "browserify": "~2.23.1",
+    "beefy": "~0.4.0"
   }
 }
