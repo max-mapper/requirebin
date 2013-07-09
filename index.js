@@ -25,6 +25,10 @@ if (parsedURL.query.gist) {
   var gistID = parsedURL.query.gist
   enableShare(gistID)
 }
+else if (parsedURL.hash){
+  var gistID = parsedURL.hash.replace("#", "")
+  enableShare(gistID)
+}
 
 var loadingClass = elementClass(document.querySelector('.loading'))
 var outputEl = document.querySelector('#play')
