@@ -258,32 +258,29 @@ loadCode(function(err, code) {
          }
       }
       github.getGist(id).read(function (err) {
-        if (err) {
-          if (err.error === 404) {
-            github.getGist().create(gist, function(err, data) {
-              loadingClass.add('hidden')
-              if (err) return alert(JSON.stringify(err))
-              window.location.href = "/?gist=" + data.id
-            })
-          } else {
-            return alert(JSON.stringify(err));
-          }
+        if (err && err.error === 404) {
+          github.getGist().create(gist, function(err, data) {
+            loadingClass.add('hidden')
+            if (err) return alert(JSON.stringify(err))
+            window.location.href = "/?gist=" + data.id
+          })
+          return
         }
+        if (err) return alert('get error' + JSON.stringify(err));
         github.getGist(id).update(gist, function (err, data) {
-          if (err) {
-            if (err.error === 404) {
-              github.getGist(id).fork(function (err, data) {
+          if (!err) return loadingClass.add('hidden')
+          if (err && err.error === 404) {
+            github.getGist(id).fork(function (err, data) {
+              if (err) return alert(JSON.stringify(err))
+              github.getGist(data.id).update(gist, function (err, data) {
+                loadingClass.add('hidden')
                 if (err) return alert(JSON.stringify(err))
-                github.getGist(data.id).update(gist, function (err, data) {
-                  loadingClass.add('hidden')
-                  if (err) return alert(JSON.stringify(err))
-                  window.location.href = "/?gist=" + data.id
-                })
-              });
-            } else {
-              return alert(JSON.stringify(err));
-            }
+                window.location.href = "/?gist=" + data.id
+              })
+            })
+            return
           }
+          if (err) return alert('update err' + JSON.stringify(err));
         })
       });
     })
