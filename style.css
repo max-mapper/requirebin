@@ -152,3 +152,11 @@ body > pre { display: none }
 	-webkit-animation-duration:.5s;
 	-webkit-animation-delay:.1s;
 }
+
+.alert {
+  width:400px;
+  position:absolute;
+  top:5px;
+  left:50%;
+  margin-left:-200px;
+}
