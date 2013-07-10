@@ -38,11 +38,13 @@ var painterEl = document.querySelector('#paint')
 
 function enableShare(gistID) {
   var textarea = document.querySelector('#shareTextarea')
+  var badgeTextarea = document.querySelector('#shareBadgeTextarea')
   var instructions = document.querySelector('#shareInstructions')
   var disabled = document.querySelector('#shareDisabled')
   elementClass(disabled).add('hidden')
   elementClass(instructions).remove('hidden')
   textarea.value = '<iframe width="560" height="315" src="' + window.location.origin + '/embed?gist=' + gistID + '" frameborder="0" allowfullscreen></iframe>'
+  badgeTextarea.value = '<a class="requirebin-link" target="_blank" href="' + window.location.origin + '/?gist=' + gistID + '"><img src="' + window.location.origin + '/badge.png"></a>'
 }
 
 function loadCode(cb) {

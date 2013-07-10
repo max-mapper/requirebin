@@ -1,8 +1,12 @@
 var jsonp = require('jsonp')
 var url = require('url')
 
+
 var parsedURL = url.parse(window.location.href, true)
 var gistID = parsedURL.query.gist
+
+var binURL = "/?gist=" + gistID
+document.querySelector('.requirebin-link').setAttribute('href', binURL)
 
 jsonp('https://api.github.com/gists/' + gistID, function(err, gist) {
   if (err) return console.log(err)
