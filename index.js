@@ -194,7 +194,7 @@ loadCode(function(err, code) {
     if (!match) return false
     var authURL = config.GATEKEEPER + '/authenticate/' + match[1]
     request({url: authURL, json: true}, function (err, resp, data) {
-      if (err) return console.err(err)
+      if (err) return console.error(err)
       console.log('resp', resp, data)
       cookie.set('oauth-token', data.token)
       loggedIn = true
