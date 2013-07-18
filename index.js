@@ -2,7 +2,9 @@ var config = require('./config')
 
 var elementClass = require('element-class')
 var jsEditor = require('javascript-editor')
+var XHR = window.XMLHttpRequest
 var createSandbox = require('browser-module-sandbox')
+window.XMLHttpRequest = XHR
 var qs = require('querystring')
 var url = require('url')
 var request = require('browser-request')
@@ -189,7 +191,6 @@ loadCode(function(err, code) {
   function authenticate() {
     if (cookie.get('oauth-token')) return loggedIn = true
     var match = window.location.href.match(/\?code=([a-z0-9]*)/)
-
     // Handle Code
     if (!match) return false
     var authURL = config.GATEKEEPER + '/authenticate/' + match[1]
