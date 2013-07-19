@@ -2,8 +2,9 @@
 
 create programs in the browser using modules from NPM
 
-the app itself is 100% client side (requirebin.com is hosted on github pages) but it relies on these two APIs:
+the app itself is 100% client side (requirebin.com is hosted on github pages) but it relies on these three APIs:
 
+- https://github.com/substack/node-browserify
 - https://github.com/jesusabdullah/browserify-cdn
 - https://github.com/prose/gatekeeper (only necessary if you want to publish gists)
 
@@ -16,6 +17,7 @@ by default `config.js` is set to use `http://localhost:8000` as the browserify-c
 ### set up browserify-cdn
 
 ```
+npm install -g browserify
 npm install -g browserify-cdn
 browserify-cdn 8000
 ```
