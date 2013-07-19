@@ -197,6 +197,7 @@ loadCode(function(err, code) {
     request({url: authURL, json: true}, function (err, resp, data) {
       if (err) return console.error(err)
       console.log('resp', resp, data)
+      if (data.token === 'undefined') return console.error('Auth failed to aquire token')
       cookie.set('oauth-token', data.token)
       loggedIn = true
       // Adjust URL
