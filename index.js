@@ -13,8 +13,9 @@ var detective = require('detective')
 
 var cookie = require('./cookie')
 var Github = require('github-api')
+var Gist = require('./github-gist.js')
 
-window.github = new Github({
+window.githubGist = new Gist({
   token: cookie.get('oauth-token'),
   auth: 'oauth'
 })
@@ -232,13 +233,13 @@ loadCode(function(err, code) {
   }
 
   function saveGist(id, opts) {
+    loadingClass.remove('hidden')
     var entry = editor.editor.getValue()
     opts = opts || {}
     opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
 
     sandbox.bundle(entry)
     sandbox.on('bundleEnd', function(bundle) {
-      loadingClass.remove('hidden')
       var minified = UglifyJS.minify(bundle.script)
       var gist = {
        "description": "requirebin sketch",
@@ -261,32 +262,9 @@ loadCode(function(err, code) {
            // }
          }
       }
-      github.getGist(id).read(function (err) {
-        if (err && err.error === 404) {
-          github.getGist().create(gist, function(err, data) {
-            loadingClass.add('hidden')
-            if (err) return alert(JSON.stringify(err))
-            window.location.href = "/?gist=" + data.id
-          })
-          return
-        }
-        if (err) return alert('get error' + JSON.stringify(err));
-        github.getGist(id).update(gist, function (err, data) {
-          if (!err) return loadingClass.add('hidden')
-          if (err && err.error === 404) {
-            github.getGist(id).fork(function (err, data) {
-              if (err) return alert(JSON.stringify(err))
-              github.getGist(data.id).update(gist, function (err, data) {
-                loadingClass.add('hidden')
-                if (err) return alert(JSON.stringify(err))
-                window.location.href = "/?gist=" + data.id
-              })
-            })
-            return
-          }
-          if (err) return alert('update err' + JSON.stringify(err));
-        })
-      });
+      githubGist.save(gist, id, opts, function(){
+        loadingClass.add('hidden')
+      })
     })
   }
 })
