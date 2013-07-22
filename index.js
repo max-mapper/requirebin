@@ -154,7 +154,7 @@ loadCode(function(err, code) {
       loadingClass.remove('hidden')
       var loginURL = "https://github.com/login/oauth/authorize" +
         "?client_id=" + config.GITHUB_CLIENT +
-        "&scope=repo, user, gist" +
+        "&scope=gist" +
         "&redirect_uri=" + window.location.href
       window.location.href = loginURL
     },
@@ -169,7 +169,7 @@ loadCode(function(err, code) {
 
       var loginURL = "https://github.com/login/oauth/authorize" +
         "?client_id=" + config.GITHUB_CLIENT +
-        "&scope=repo, user, gist" +
+        "&scope=gist" +
         "&redirect_uri=" + target
 
       window.location.href = loginURL
