@@ -262,8 +262,10 @@ loadCode(function(err, code) {
            // }
          }
       }
-      githubGist.save(gist, id, opts, function(){
+      githubGist.save(gist, id, opts, function(err, gistId) {
         loadingClass.add('hidden')
+        if (err) alert(err.toString());
+        if (gistId) window.location.href = "/?gist=" + gistId
       })
     })
   }

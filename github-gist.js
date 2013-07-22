@@ -8,40 +8,44 @@ Gist.prototype.save = function(gist, id, opts, callback) {
 
   var github = this.github
 
-  var complete = function(err){
-    if (err){
-      if (typeof err !== 'string')
-        err = JSON.stringify(err)
+  var complete = function(err, gistId){
 
-      throw new Error(err)
-      alert(JSON.stringify(err))
+    if (err){
+      if (typeof err !== 'string') err = JSON.stringify(err)
+      var err = Error(err)
     }
-    callback()
+
+    callback(err, gistId)
   };
 
   github.getGist(id).read(function (err) {
     if (err && err.error === 404) {
+      // a gist with this id does not exist. create a new one:
       github.getGist().create(gist, function(err, data) {
         if (err) return complete(err)
-        window.location.href = "/?gist=" + data.id
+        complete(null, data.id) // id of the newly created gist
       })
-      return complete()
     }
+    // check for non-404 error
     if (err) return complete('get error' + JSON.stringify(err));
+
+    // The gist exists. Update it:
     github.getGist(id).update(gist, function (err, data) {
-      if (!err) return complete()
-      if (err && err.error === 404) {
-        github.getGist(id).fork(function (err, data) {
-          if (err) return complete(err)
-          github.getGist(data.id).update(gist, function (err, data) {
-            loadingClass.add('hidden')
-            if (err) return complete(err)
-            window.location.href = "/?gist=" + data.id
-          })
+      if (!err) return complete() // successfull update.
+
+      // Arbitrary error while updating
+      if (err.error !== 404) return complete(err)
+
+      github.getGist(id).fork(function (err, data) {
+        if (err) return complete(err) // failed to fork
+
+        github.getGist(data.id).update(gist, function (err, data) {
+          if (err) return complete(err) // failed to update fork
+
+          return complete(null, data.id) // successfull fork update
         })
-        return complete()
-      }
-      if (err) return complete(err);
+      })
+
     })
   });
 }
