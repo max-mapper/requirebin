@@ -13,7 +13,7 @@
   "dependencies": {
     "element-class": "0.0.2",
     "jsonp": "0.0.3",
-    "javascript-editor": "0.2.0",
+    "javascript-editor": "~0.2.1",
     "uglify-js": "2.2.3",
     "browser-module-sandbox": "~1.2.1",
     "github-oauth": "0.0.4",

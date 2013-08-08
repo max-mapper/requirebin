@@ -9,7 +9,7 @@
 }
 .CodeMirror-scroll {
   /* Set scrolling behaviour here */
-  overflow: hidden;
+  overflow: auto;
 }
 
 /* PADDING */
