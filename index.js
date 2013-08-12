@@ -6,13 +6,13 @@ var createSandbox = require('browser-module-sandbox')
 var qs = require('querystring')
 var url = require('url')
 var request = require('browser-request')
-var jsonp = require('jsonp')
 var detective = require('detective')
 
 var cookie = require('./cookie')
 var Github = require('github-api')
+var Gist = require('./github-gist.js')
 
-window.github = new Github({
+window.githubGist = new Gist({
   token: cookie.get('oauth-token'),
   auth: 'oauth'
 })
@@ -50,7 +50,7 @@ function enableShare(gistID) {
 function loadCode(cb) {
   if (gistID) {
     loadingClass.remove('hidden')
-    return jsonp('https://api.github.com/gists/' + gistID, function(err, gist) {
+    return githubGist.load(gistID, function(err, gist) {
       loadingClass.add('hidden')
       if (err) return cb(err)
       var json = gist.data
@@ -189,13 +189,13 @@ loadCode(function(err, code) {
   function authenticate() {
     if (cookie.get('oauth-token')) return loggedIn = true
     var match = window.location.href.match(/\?code=([a-z0-9]*)/)
-
     // Handle Code
     if (!match) return false
     var authURL = config.GATEKEEPER + '/authenticate/' + match[1]
     request({url: authURL, json: true}, function (err, resp, data) {
       if (err) return console.error(err)
       console.log('resp', resp, data)
+      if (data.token === 'undefined') return console.error('Auth failed to aquire token')
       cookie.set('oauth-token', data.token)
       loggedIn = true
       // Adjust URL
@@ -230,13 +230,13 @@ loadCode(function(err, code) {
   }
 
   function saveGist(id, opts) {
+    loadingClass.remove('hidden')
     var entry = editor.editor.getValue()
     opts = opts || {}
     opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
 
     sandbox.bundle(entry)
     sandbox.on('bundleEnd', function(bundle) {
-      loadingClass.remove('hidden')
       var minified = UglifyJS.minify(bundle.script)
       var gist = {
        "description": "requirebin sketch",
@@ -259,32 +259,11 @@ loadCode(function(err, code) {
            // }
          }
       }
-      github.getGist(id).read(function (err) {
-        if (err && err.error === 404) {
-          github.getGist().create(gist, function(err, data) {
-            loadingClass.add('hidden')
-            if (err) return alert(JSON.stringify(err))
-            window.location.href = "/?gist=" + data.id
-          })
-          return
-        }
-        if (err) return alert('get error' + JSON.stringify(err));
-        github.getGist(id).update(gist, function (err, data) {
-          if (!err) return loadingClass.add('hidden')
-          if (err && err.error === 404) {
-            github.getGist(id).fork(function (err, data) {
-              if (err) return alert(JSON.stringify(err))
-              github.getGist(data.id).update(gist, function (err, data) {
-                loadingClass.add('hidden')
-                if (err) return alert(JSON.stringify(err))
-                window.location.href = "/?gist=" + data.id
-              })
-            })
-            return
-          }
-          if (err) return alert('update err' + JSON.stringify(err));
-        })
-      });
+      githubGist.save(gist, id, opts, function(err, gistId) {
+        loadingClass.add('hidden')
+        if (err) alert(err.toString());
+        if (gistId) window.location.href = "/?gist=" + gistId
+      })
     })
   }
 })
