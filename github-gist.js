@@ -26,6 +26,7 @@ Gist.prototype.save = function(gist, id, opts, callback) {
         if (err) return complete(err)
         complete(null, data.id) // id of the newly created gist
       })
+      return
     }
     // check for non-404 error
     if (err) return complete('get error' + JSON.stringify(err));
