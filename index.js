@@ -2,13 +2,10 @@ var config = require('./config')
 
 var elementClass = require('element-class')
 var jsEditor = require('javascript-editor')
-var XHR = window.XMLHttpRequest
 var createSandbox = require('browser-module-sandbox')
-window.XMLHttpRequest = XHR
 var qs = require('querystring')
 var url = require('url')
 var request = require('browser-request')
-var jsonp = require('jsonp')
 var detective = require('detective')
 
 var cookie = require('./cookie')
@@ -53,7 +50,7 @@ function enableShare(gistID) {
 function loadCode(cb) {
   if (gistID) {
     loadingClass.remove('hidden')
-    return jsonp('https://api.github.com/gists/' + gistID, function(err, gist) {
+    return githubGist.load(gistID, function(err, gist) {
       loadingClass.add('hidden')
       if (err) return cb(err)
       var json = gist.data

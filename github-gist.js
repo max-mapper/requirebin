@@ -1,4 +1,5 @@
 var Github = require('github-api')
+var jsonp = require('jsonp')
 
 module.exports = exports = Gist = function(options){
   this.github = new Github(options)
@@ -50,3 +51,6 @@ Gist.prototype.save = function(gist, id, opts, callback) {
   });
 }
 
+Gist.prototype.load = function(id, callback) {
+  return jsonp('https://api.github.com/gists/' + id, callback)
+}
