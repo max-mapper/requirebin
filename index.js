@@ -7,6 +7,7 @@ var qs = require('querystring')
 var url = require('url')
 var request = require('browser-request')
 var detective = require('detective')
+var md5 = require('md5-jkmyers')
 
 var cookie = require('./cookie')
 var Github = require('github-api')
@@ -16,6 +17,8 @@ window.githubGist = new Gist({
   token: cookie.get('oauth-token'),
   auth: 'oauth'
 })
+
+var codeMD5
 
 var loggedIn = false
 if (cookie.get('oauth-token')) loggedIn = true
@@ -55,16 +58,17 @@ function loadCode(cb) {
       if (err) return cb(err)
       var json = gist.data
       if (!json.files || !json.files['index.js']) return cb({error: 'no index.js in this gist', json: json})
-      cb(false, json.files['index.js'].content)
+      var code = json.files['index.js'].content 
+      codeMD5 = md5(code)
+      cb(false, code)
     })
   }
 
   var stored = localStorage.getItem('code')
   if (stored) return cb(false, stored)
 
-  // todo read from template/file/server
-  var defaultGame = document.querySelector('#template').innerText
-  cb(false, defaultGame)
+  var defaultCode = document.querySelector('#template').innerText
+  cb(false, defaultCode)
 }
 
 loadCode(function(err, code) {
@@ -136,7 +140,13 @@ loadCode(function(err, code) {
       elementClass(howTo).add('hidden')
       elementClass(outputEl).remove('hidden')
       elementClass(editorEl).add('hidden')
-      sandbox.bundle(editor.editor.getValue())
+      var code = editor.editor.getValue()
+      if (codeMD5 && codeMD5 === md5(code)) {
+        crosshair.style.display = 'none'
+        sandbox.iframe.setHTML('<script type="text/javascript" src="embed-bundle.js"></script>')
+      } else {
+        sandbox.bundle(code)
+      }
     },
 
     edit: function() {
@@ -144,7 +154,6 @@ loadCode(function(err, code) {
       if (!editorEl.className.match(/hidden/)) return
       elementClass(editorEl).remove('hidden')
       elementClass(outputEl).add('hidden')
-      // clear current game
       if (sandbox.iframe) sandbox.iframe.setHTML(" ")
       elementClass(howTo).add('hidden')
     },
@@ -215,7 +224,7 @@ loadCode(function(err, code) {
     crosshairClass.remove('spinning')
     crosshair.style.display = 'none'
     if (!bundle)
-      tooltipMessage('error', 'There was an issue loading the modules')
+      tooltipMessage('error', 'Bundling error. See Dev Tools Network tab for more info')
   })
 
   sandbox.on('modules', function(modules) {

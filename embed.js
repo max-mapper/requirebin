@@ -6,7 +6,8 @@ var parsedURL = url.parse(window.location.href, true)
 var gistID = parsedURL.query.gist
 
 var binURL = "/?gist=" + gistID
-document.querySelector('.requirebin-link').setAttribute('href', binURL)
+var link = document.querySelector('.requirebin-link')
+if (link) link.setAttribute('href', binURL)
 
 jsonp('https://api.github.com/gists/' + gistID, function(err, gist) {
   if (err) return console.log(err)

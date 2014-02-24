@@ -20,7 +20,8 @@
     "concat-stream": "1.0.0",
     "github-api": "0.7.0",
     "detective": "~2.1.2",
-    "browser-request": "~0.3.1"
+    "browser-request": "~0.3.1",
+    "md5-jkmyers": "~0.0.1"
   },
   "engines": {
     "node": ">=0.8.x"
