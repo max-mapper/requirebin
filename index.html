@@ -27,8 +27,8 @@
     
     <div class="btn-toolbar actionsButtons">
       <div class="btn-group">
-        <a data-action="edit" class="btn btn-primary active"><i class="fui-new-16"></i></a>
-        <a data-action="play" class="btn btn-primary"><i class="fui-eye-16"></i></a>
+        <a data-action="edit" class="btn btn-primary active"><i class="fui-new-16"></i>Edit</a>
+        <a data-action="play" class="btn btn-primary"><i class="fui-eye-16"></i>Run</a>
       </div>
     </div>
           
@@ -54,10 +54,14 @@
       <div id="howto" class="">
         <p>Shareable JavaScript programs using modules from <a href="http://npmjs.org" target="_blank"><span class="npm"></span></a>.
         </p>
+
         <p>Node.js style modular code gets transformed into code that can run client-side using <a href="http://browserify.org/" target="_blank">browserify</a> via <a href="http://wzrd.in.nyud.net/" target="_blank">browserify-cdn</a>.</p>
+                
         <p>Want to see an example? <a href="/?gist=5940808">requirebin.com/?gist=5940808</a></p>
         <p>They are also embeddable <a href="/embed?gist=5940808">requirebin.com/embed?gist=5940808</a></p>
-        <p>The <span class="view-icon"></span> button above runs the code from the current bin.</p>
+        <p>The <span class="view-icon"></span> buttons run the code from the current bin.</p>
+        <div class="col-xs-3"><a class="run-btn btn btn-block btn-lg btn-primary"><i class="fui-eye-16"></i> Run This Bin</a></div>
+        
         <div class="attribution">
           <p>View the source or report bugs <a href="https://github.com/maxogden/requirebin" target="_blank">on Github</a>.</p>
           <p><strong>Need Help?</strong> Send a question via tweet to <a href="http://twitter.com/maxogden" target="_blank">@maxogden</a></p>
@@ -65,6 +69,7 @@
         </div>
       </div>
       <div class="packagejson">
+        <h6>Modules In Use</h6>
         <div id="tagsinput" class="tagsinput" />
           <div class="tagsinput-add">No Modules Required Yet</div>
         </div>

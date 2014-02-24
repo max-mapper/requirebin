@@ -18,9 +18,15 @@ a { cursor: pointer; cursor: hand; }
   float: right;
 }
 .requirebin-badge { width: 100px; height: 100px; background: url(badge.png) no-repeat 0 0; background-size: 100px 100px; z-index: 1000; }
+.col-xs-3 { width: 38%; padding-top: 10px; }
+.run-btn { line-height: 34px; }
+.run-btn i { position: relative; top: 1.5px; right: 2px; }
 
 .actionsMenu { width: 224px; float: right; margin: 5px 10px; }
 .actionsButtons { margin: 5px 10px; float: right; }
+.actionsButtons i { position: relative; top: 1px; }
+.actionsButtons .fui-new-16 { margin-right: 7px; }
+.actionsButtons .fui-eye-16 { margin-right: 5px; }
 .large {
   position: absolute;
   top: 50px;
@@ -115,7 +121,7 @@ body > pre { display: none }
 #howto, #share, .packagejson { padding: 20px; float: right; width: 30%; overflow: auto; border-left: 1px solid #eee; border-bottom: 1px solid #eee; }
 .packagejson { clear: both; }
 .packagejson .tagsinput .tag:hover { padding: 6px 13px 6px 19px; }
-.packagejson h4 { margin-top: -3px; margin-bottom: 15px; }
+.packagejson h6 { margin-top: 0; }
 #howto ul { list-style-type: none; }
 #howto p { margin-bottom: 10px }
 .logo { padding: 0px 6px 0 1px; margin-top: 5px; float: left; background-size: 40px 200px; width: 200px; }

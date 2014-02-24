@@ -126,6 +126,12 @@ loadCode(function(err, code) {
       }, 0)
     }
   })
+  
+  $('.run-btn').click(function(e) {
+    e.preventDefault()
+    $('a[data-action="play"]').click()
+    return false
+  })
 
   $(".actionsButtons a").click(function() {
     var target = $(this)
@@ -150,12 +156,11 @@ loadCode(function(err, code) {
     },
 
     edit: function() {
-      elementClass(howTo).add('hidden')
+      elementClass(howTo).remove('hidden')
       if (!editorEl.className.match(/hidden/)) return
       elementClass(editorEl).remove('hidden')
       elementClass(outputEl).add('hidden')
       if (sandbox.iframe) sandbox.iframe.setHTML(" ")
-      elementClass(howTo).add('hidden')
     },
 
     save: function() {
