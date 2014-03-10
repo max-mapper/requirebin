@@ -98,7 +98,7 @@ function initialize() {
              "content": "made with [requirebin](http://requirebin.com)"
            },
            "package.json": {
-             "content": JSON.stringify(packagejson)
+             "content": JSON.stringify(packagejson, null, '  ')
            }
          }
       }
