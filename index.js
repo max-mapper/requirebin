@@ -238,7 +238,8 @@ loadCode(function(err, code) {
   sandbox.on('modules', function(modules) {
     if (!modules) return
     packagejson.dependencies = {}
-    Object.keys(modules).map(function(mod) {
+    modules.forEach(function(mod) {
+      if (mod.core) return
       packagejson.dependencies[mod.name] = mod.version
     })
   })
