@@ -19,6 +19,9 @@ window.githubGist = new Gist({
 })
 
 var codeMD5
+var packagejson = {"name": "requirebin-sketch", "version": "1.0.0"}
+
+window.packagejson = packagejson
 
 var loggedIn = false
 if (cookie.get('oauth-token')) loggedIn = true
@@ -233,7 +236,11 @@ loadCode(function(err, code) {
   })
 
   sandbox.on('modules', function(modules) {
-    // TODO show package.json editor
+    if (!modules) return
+    packagejson.dependencies = {}
+    Object.keys(modules).map(function(mod) {
+      packagejson.dependencies[mod.name] = mod.version
+    })
   })
 
   if (!gistID) {
@@ -267,10 +274,10 @@ loadCode(function(err, code) {
            },
            "requirebin.md": {
              "content": "view on [requirebin](http://requirebin.com?gist=" + id + ")"
-           }// ,
-           // "package.json": {
-           //   "content": JSON.stringify(packagejson)
-           // }
+           },
+           "package.json": {
+             "content": JSON.stringify(packagejson)
+           }
          }
       }
       githubGist.save(gist, id, opts, function(err, gistId) {
