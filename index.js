@@ -167,11 +167,21 @@ function initialize() {
       saveGist(gistID, {
         'isPublic': !parsedURL.query['private']
       })
-      return
     } else {
       sandbox = createSandbox(sandboxOpts)
     }
-
+    
+    sandbox.on('modules', function(modules) {
+      if (!modules) return
+      packagejson.dependencies = {}
+      modules.forEach(function(mod) {
+        if (mod.core) return
+        packagejson.dependencies[mod.name] = mod.version
+      })
+    })
+    
+    if (parsedURL.query.save) return
+    
     var howTo = document.querySelector('#howto')
     var share = document.querySelector('#share')
     var crosshair = document.querySelector('#crosshair')
@@ -285,15 +295,6 @@ function initialize() {
       crosshair.style.display = 'none'
       if (!bundle)
         tooltipMessage('error', 'Bundling error. See Dev Tools Network tab for more info')
-    })
-
-    sandbox.on('modules', function(modules) {
-      if (!modules) return
-      packagejson.dependencies = {}
-      modules.forEach(function(mod) {
-        if (mod.core) return
-        packagejson.dependencies[mod.name] = mod.version
-      })
     })
 
     if (!gistID) {
