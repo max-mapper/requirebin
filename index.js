@@ -169,10 +169,11 @@ loadCode(function(err, code) {
     save: function() {
       if (loggedIn) return saveGist(gistID)
       loadingClass.remove('hidden')
+      var currentHost = parsedURL.protocol + '//' + parsedURL.hostname
       var loginURL = "https://github.com/login/oauth/authorize" +
         "?client_id=" + config.GITHUB_CLIENT +
         "&scope=gist" +
-        "&redirect_uri=" + window.location.href
+        "&redirect_uri=" + currentHost
       window.location.href = loginURL
     },
 
