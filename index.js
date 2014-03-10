@@ -274,17 +274,17 @@ loadCode(function(err, code) {
              "content": bundle.head
            },
            "requirebin.md": {
-             "content": "view on [requirebin](http://requirebin.com?gist=" + id + ")"
+             "content": "made with [requirebin](http://requirebin.com)"
            },
            "package.json": {
              "content": JSON.stringify(packagejson)
            }
          }
       }
-      githubGist.save(gist, id, opts, function(err, gistId) {
+      githubGist.save(gist, id, opts, function(err, newGistId) {
         loadingClass.add('hidden')
         if (err) alert(err.toString());
-        if (gistId) window.location.href = "/?gist=" + gistId
+        if (newGistId) window.location.href = "/?gist=" + newGistId
       })
     })
   }
