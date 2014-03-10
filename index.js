@@ -157,19 +157,16 @@ function initialize() {
     var sandboxOpts = {
       cdn: config.BROWSERIFYCDN,
       container: outputEl,
-      iframeStyle: "body, html { height: 100%; width: 100%; }",
-      cacheOpts: { inMemory: true }
+      iframeStyle: "body, html { height: 100%; width: 100%; }"
     }
     
-    if (parsedURL.query.save) {
-      // timeout is to avoid crazy indexeddb errors due to too many page reloads during save
-      console.log("TIMING OUT")
-      setTimeout(function() {
-        sandbox = createSandbox(sandboxOpts)
-        saveGist(gistID, {
-          'isPublic': !parsedURL.query['private']
-        })
-      }, 1000)
+    if (parsedURL.query.save) 
+      // use memdown here to avoid indexeddb transaction bugs :(
+      sandboxOpts.cacheOpts = { inMemory: true }
+      sandbox = createSandbox(sandboxOpts)
+      saveGist(gistID, {
+        'isPublic': !parsedURL.query['private']
+      })
       return
     } else {
       sandbox = createSandbox(sandboxOpts)
