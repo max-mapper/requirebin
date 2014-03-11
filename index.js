@@ -23,9 +23,8 @@ function initialize() {
 
   var codeMD5, sandbox
   var packagejson = {"name": "requirebin-sketch", "version": "1.0.0"}
-
   window.packagejson = packagejson
-
+  
   var loggedIn = false
   if (cookie.get('oauth-token')) loggedIn = true
 
@@ -61,7 +60,7 @@ function initialize() {
     request({url: authURL, json: true}, function (err, resp, data) {
       if (err) return console.error(err)
       console.log('auth response', resp, data)
-      if (data.token === 'undefined') return console.error('Auth failed to aquire token')
+      if (data.token === 'undefined') return console.error('Auth failed to acquire token')
       cookie.set('oauth-token', data.token)
       loggedIn = true
       // Adjust URL
@@ -78,7 +77,7 @@ function initialize() {
     opts = opts || {}
     opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
 
-    sandbox.bundle(entry)
+    sandbox.bundle(entry, packagejson.dependencies)
     sandbox.on('bundleEnd', function(bundle) {
       var minified = UglifyJS.minify(bundle.script)
       var gist = {
@@ -129,7 +128,13 @@ function initialize() {
         if (err) return cb(err)
         var json = gist.data
         if (!json.files || !json.files['index.js']) return cb({error: 'no index.js in this gist', json: json})
-        var code = json.files['index.js'].content 
+        var code = json.files['index.js'].content
+        var pj = json.files['package.json']
+        if (pj) {
+          try { pj = JSON.parse(pj.content) }
+          catch (e) { pj = false }
+          if (pj) packagejson.dependencies = pj.dependencies
+        }
         codeMD5 = md5(code)
         cb(false, code)
       })
@@ -239,7 +244,7 @@ function initialize() {
           crosshair.style.display = 'none'
           sandbox.iframe.setHTML('<script type="text/javascript" src="embed-bundle.js"></script>')
         } else {
-          sandbox.bundle(code)
+          sandbox.bundle(code, packagejson.dependencies)
         }
       },
 
