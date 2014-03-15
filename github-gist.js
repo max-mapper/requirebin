@@ -24,7 +24,7 @@ Gist.prototype.save = function(gist, id, opts, callback) {
       // a gist with this id does not exist. create a new one:
       github.getGist().create(gist, function(err, data) {
         if (err) return complete(err)
-        complete(null, data.id) // id of the newly created gist
+        complete(null, data)
       })
       return
     }
@@ -33,7 +33,7 @@ Gist.prototype.save = function(gist, id, opts, callback) {
 
     // The gist exists. Update it:
     github.getGist(id).update(gist, function (err, data) {
-      if (!err) return complete() // successfull update.
+      if (!err) return complete(null, data) // successful update.
 
       // Arbitrary error while updating
       if (err.error !== 404) return complete(err)
@@ -44,7 +44,7 @@ Gist.prototype.save = function(gist, id, opts, callback) {
         github.getGist(data.id).update(gist, function (err, data) {
           if (err) return complete(err) // failed to update fork
 
-          return complete(null, data.id) // successfull fork update
+          return complete(null, data) // successful fork update
         })
       })
 

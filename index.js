@@ -29,12 +29,11 @@ function initialize() {
   if (cookie.get('oauth-token')) loggedIn = true
 
   var parsedURL = url.parse(window.location.href, true)
-  if (parsedURL.query.gist) {
-    var gistID = parsedURL.query.gist
-    enableShare(gistID)
-  }
-  else if (parsedURL.hash){
-    var gistID = parsedURL.hash.replace("#", "")
+
+  var gistID = getGistID(parsedURL)
+  if (gistID) {
+    var gistUser = gistID.user
+    gistID = gistID.id
     enableShare(gistID)
   }
 
@@ -101,7 +100,11 @@ function initialize() {
            }
          }
       }
-      githubGist.save(gist, id, opts, function(err, newGistId) {
+      githubGist.save(gist, id, opts, function(err, newGist) {
+        var newGistId = newGist.id
+        if (newGist.user && newGist.user.login) {
+          newGistId = newGist.user.login + '/' + newGistId
+        }
         loadingClass.add('hidden')
         if (err) alert(err.toString());
         if (newGistId) window.location.href = "/?gist=" + newGistId
@@ -338,4 +341,25 @@ function tooltipMessage(cssClass, text) {
     document.querySelector('body').appendChild(message)
     message.appendChild(close)
   }
+}
+
+function getGistID(parsedURL) {
+  if (parsedURL.query.gist) {
+    var gistID = parsedURL.query.gist
+  } else if (parsedURL.hash) {
+    var gistID = parsedURL.hash.replace("#", "")
+  }
+  if (!gistID) return
+  if (gistID.indexOf('/') > -1) {
+    var parts = gistID.split('/')
+    gistID = {
+      user: parts[0],
+      id: parts[1]
+    }
+  } else {
+    gistID = {
+      id: gistID
+    }
+  }
+  return gistID
 }
