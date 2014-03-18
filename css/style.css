@@ -162,6 +162,8 @@ body > pre { display: none }
 }
 
 .alert {
+  z-index: 100;
+  white-space: pre;
   width:400px;
   position:absolute;
   top:5px;
