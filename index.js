@@ -258,6 +258,7 @@ function initialize() {
         if (!editorEl.className.match(/hidden/)) return
         elementClass(editorEl).remove('hidden')
         elementClass(outputEl).add('hidden')
+        document.querySelector('.alert').classList.add('hidden')
         if (sandbox.iframe) sandbox.iframe.setHTML(" ")
       },
 
@@ -303,8 +304,14 @@ function initialize() {
     sandbox.on('bundleEnd', function(bundle) {
       crosshairClass.remove('spinning')
       crosshair.style.display = 'none'
-      if (!bundle)
-        tooltipMessage('error', 'Bundling error. See Dev Tools Network tab for more info')
+    })
+
+    sandbox.on('bundleError', function(err) {
+      crosshairClass.remove('spinning')
+      crosshair.style.display = 'none'
+
+      console.log(err)
+      tooltipMessage('error', "Bundling error: \n\n" + err)
     })
 
     if (!gistID) {
