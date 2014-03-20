@@ -258,7 +258,8 @@ function initialize() {
         if (!editorEl.className.match(/hidden/)) return
         elementClass(editorEl).remove('hidden')
         elementClass(outputEl).add('hidden')
-        document.querySelector('.alert').classList.add('hidden')
+        var message = document.querySelector('.alert')
+        if (message) message.classList.add('hidden')
         if (sandbox.iframe) sandbox.iframe.setHTML(" ")
       },
 
@@ -310,7 +311,6 @@ function initialize() {
       crosshairClass.remove('spinning')
       crosshair.style.display = 'none'
 
-      console.log(err)
       tooltipMessage('error', "Bundling error: \n\n" + err)
     })
 

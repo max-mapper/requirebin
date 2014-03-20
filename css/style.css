@@ -164,7 +164,7 @@ body > pre { display: none }
 .alert {
   z-index: 100;
   white-space: pre;
-  width:400px;
+  width:435px;
   position:absolute;
   top:5px;
   left:50%;
