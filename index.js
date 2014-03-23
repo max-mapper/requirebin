@@ -206,10 +206,14 @@ function initialize() {
       packageTags.html('')
       var modules = detective(editor.editor.getValue())
       modules.map(function(module) {
-        var tag =
-          '<span class="tag"><a target="_blank" href="http://npmjs.org/' +
-            module + '"><span>' + module + '&nbsp;&nbsp;</span></a></span>'
-        packageTags.append(tag)
+        $.getJSON('http://jsonp.jit.su/?callback=?&url=http://isaacs.iriscouch.com/registry/' + module, function(found){
+            if(found){
+              var tag =
+                '<span class="tag"><a target="_blank" href="http://npmjs.org/' +
+                  module + '"><span>' + module + '&nbsp;&nbsp;</span></a></span>'
+              packageTags.append(tag)
+            }
+        })
       })
       if (modules.length === 0) packageTags.append('<div class="tagsinput-add">No Modules Required Yet</div>')
     })
