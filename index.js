@@ -206,8 +206,8 @@ function initialize() {
       packageTags.html('')
       var modules = detective(editor.editor.getValue())
       modules.map(function(module) {
-        $.getJSON('http://jsonp.jit.su/?callback=?&url=http://isaacs.iriscouch.com/registry/' + module, function(found){
-            if(found){
+        request('http://cors.maxogden.com/http://isaacs.iriscouch.com/registry/' + module, function(err, resp){            
+          if(resp.statusCode != 404){
               var tag =
                 '<span class="tag"><a target="_blank" href="http://npmjs.org/' +
                   module + '"><span>' + module + '&nbsp;&nbsp;</span></a></span>'
