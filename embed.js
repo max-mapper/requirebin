@@ -8,7 +8,7 @@ var binURL = "/?gist=" + gistID
 var link = document.querySelector('.requirebin-link')
 if (link) link.setAttribute('href', binURL)
 
-if (gistID.indexOf('/') > -1) gistId = gistId.split('/')[1]
+if (gistID.indexOf('/') > -1) gistID = gistID.split('/')[1]
 loadFromAPI(gistID)
 
 function loadFromAPI(gistID) {
