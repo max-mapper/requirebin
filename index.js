@@ -78,7 +78,7 @@ function initialize() {
 
     sandbox.bundle(entry, packagejson.dependencies)
     sandbox.on('bundleEnd', function(bundle) {
-      var minified = UglifyJS.minify(bundle.script)
+      var minified = UglifyJS.minify(bundle.script, {mangle: {except: ['require'] })
       var gist = {
        "description": "requirebin sketch",
          "public": opts.isPublic,
