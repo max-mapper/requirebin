@@ -79,7 +79,7 @@ function initialize() {
 
     sandbox.bundle(entry, packagejson.dependencies)
     sandbox.on('bundleEnd', function(bundle) {
-      var minified = uglify.minify(bundle.script, {fromString: true})
+      var minified = uglify.minify(bundle.script, {fromString: true, mangle: false})
       
       var gist = {
        "description": "requirebin sketch",
@@ -89,7 +89,7 @@ function initialize() {
              "content": entry
            },
            "minified.js": {
-             "content": minified.code
+             "content": minified.codebr
            },
            "page-head.html": {
              "content": bundle.head
