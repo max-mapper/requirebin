@@ -79,7 +79,8 @@ function initialize() {
 
     sandbox.bundle(entry, packagejson.dependencies)
     sandbox.on('bundleEnd', function(bundle) {
-      var minified = uglify.minify(bundle.script)
+      var minified = uglify.minify(bundle.script, {fromString: true})
+      
       var gist = {
        "description": "requirebin sketch",
          "public": opts.isPublic,
@@ -88,7 +89,7 @@ function initialize() {
              "content": entry
            },
            "minified.js": {
-             "content": minified
+             "content": minified.code
            },
            "page-head.html": {
              "content": bundle.head
