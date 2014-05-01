@@ -89,7 +89,7 @@ function initialize() {
              "content": entry
            },
            "minified.js": {
-             "content": minified.codebr
+             "content": minified.code
            },
            "page-head.html": {
              "content": bundle.head
