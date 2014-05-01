@@ -12,6 +12,7 @@ var md5 = require('md5-jkmyers')
 var cookie = require('./cookie')
 var Github = require('github-api')
 var Gist = require('./github-gist.js')
+var uglify = require('uglify-js')
 
 initialize()
 
@@ -78,7 +79,7 @@ function initialize() {
 
     sandbox.bundle(entry, packagejson.dependencies)
     sandbox.on('bundleEnd', function(bundle) {
-      var minified = UglifyJS.minify(bundle.script, {mangle: {except: ['require'] }})
+      var minified = uglify.minify(bundle.script, {mangle: {except: ['require'] }})
       var gist = {
        "description": "requirebin sketch",
          "public": opts.isPublic,
