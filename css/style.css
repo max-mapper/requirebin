@@ -94,6 +94,7 @@ body > pre { display: none }
 
 .npm {
   background: url(../img/npm.png);
+  background-size: 38px 15px;
   width: 38px;
   height: 15px;
   display: inline-block;
