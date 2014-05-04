@@ -23,10 +23,11 @@ a { cursor: pointer; cursor: hand; }
 .run-btn i { position: relative; top: 1.5px; right: 2px; }
 
 .actionsMenu { width: 224px; float: right; margin: 5px 10px; }
-.actionsButtons { margin: 5px 10px; float: right; }
+.actionsButtons { margin: 5px 0; float: right; }
 .actionsButtons i { position: relative; top: 1px; }
 .actionsButtons .fui-new-16 { margin-right: 7px; }
 .actionsButtons .fui-eye-16 { margin-right: 5px; }
+.actionsButtons a.btn-primary { padding: 9px 14px 10px 14px; }
 .large {
   position: absolute;
   top: 50px;
@@ -34,16 +35,26 @@ a { cursor: pointer; cursor: hand; }
   right: 0;
   bottom: 0;
 }
-.hidden { visibility: hidden; display: none; }
-
-.btn-toolbar .btn {
-  padding-top: 9px !important;
+.left {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 50%;
+  bottom: 0;
 }
+.right {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  right: 0;
+  bottom: 0;
+}
+.hidden { visibility: hidden; display: none; }
 
 .tagsinput { height: auto; }
 .tag a { color: white; text-decoration: none; }
 
-#edit, #play { z-index: 1; border-top: 1px solid #eee; }
+#edit, #play { z-index: 1; border-top: 1px solid #eee; border-right: 1px solid #eee; }
 
 #edit .CodeMirror {
 
@@ -85,8 +96,6 @@ html, body, #editor { height: 100%; }
 /* mysterious pre */
 body > pre { display: none } 
 
-.left, .right { height: 100%; overflow: visible; display: block; float: left; position: relative; width: 50%; }
-.right { background: #eee; }
 /* codemirror */
 .CodeMirror { font-size:12px; }
 

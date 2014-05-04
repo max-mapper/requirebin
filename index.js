@@ -46,7 +46,6 @@ function initialize() {
   var loadingClass = elementClass(document.querySelector('.spinner'))
   var outputEl = document.querySelector('#play')
   var editorEl = document.querySelector('#edit')
-  var painterEl = document.querySelector('#paint')
 
   function authenticate() {
     if (cookie.get('oauth-token')) {
@@ -196,8 +195,6 @@ function initialize() {
     
     var howTo = document.querySelector('#howto')
     var share = document.querySelector('#share')
-    var crosshair = document.querySelector('#crosshair')
-    var crosshairClass = elementClass(crosshair)
     var controlsContainer = document.querySelector('#controls')
     var textBox = document.querySelector("#shareTextarea")
 
@@ -237,18 +234,13 @@ function initialize() {
       var target = $(this)
       var action = target.attr('data-action')
       if (action in actions) actions[action]()
-      target.siblings().removeClass("active")
-      target.addClass("active")
     })
 
     var actions = {
       play: function() {
-        elementClass(howTo).add('hidden')
-        elementClass(outputEl).remove('hidden')
-        elementClass(editorEl).add('hidden')
         var code = editor.editor.getValue()
         if (codeMD5 && codeMD5 === md5(code)) {
-          crosshair.style.display = 'none'
+          loadingClass.add('hidden')
           sandbox.iframe.setHTML('<script type="text/javascript" src="embed-bundle.js"></script>')
         } else {
           sandbox.bundle(code, packagejson.dependencies)
@@ -300,19 +292,15 @@ function initialize() {
     }
 
     sandbox.on('bundleStart', function() {
-      crosshair.style.display = 'block'
-      crosshairClass.add('spinning')
+      loadingClass.remove('hidden')
     })
 
     sandbox.on('bundleEnd', function(bundle) {
-      crosshairClass.remove('spinning')
-      crosshair.style.display = 'none'
+      loadingClass.add('hidden')
     })
 
     sandbox.on('bundleError', function(err) {
-      crosshairClass.remove('spinning')
-      crosshair.style.display = 'none'
-
+      loadingClass.add('hidden')
       tooltipMessage('error', "Bundling error: \n\n" + err)
     })
 

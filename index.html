@@ -23,17 +23,11 @@
       <option value="share">Share/Embed</option>
     </select>
     
-    <div class="btn-toolbar actionsButtons">
-      <div class="btn-group">
-        <a data-action="edit" class="btn btn-primary active"><i class="fui-new-16"></i>Edit</a>
-        <a data-action="play" class="btn btn-primary"><i class="fui-eye-16"></i>Run</a>
-      </div>
+    <div class="actionsButtons">
+      <a data-action="play" class="btn btn-block btn-lg btn-primary"><i class="fui-eye-16"></i>Run</a>
     </div>
           
-    <div id="play" class="large hidden">
-      <div id="crosshair"></div>
-    </div>
-    <div id="paint" class="large hidden">
+    <div id="play" class="right">
     </div>
     
     <div class="spinner hidden">
@@ -44,7 +38,7 @@
       <div class="rect5"></div>
     </div>
     
-    <div id="edit" class="large">
+    <div id="edit" class="left">
       <div id="share" class="hidden">
         <p id="shareDisabled">You have to save your project before you can embed it.</p>
         <div id="shareInstructions" class="hidden">
