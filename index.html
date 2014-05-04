@@ -12,11 +12,9 @@
   </head>
   <body>
     <a href="/"><img class="logo" src="img/logo-black.png"></a>
-
-    <div class="loading hidden">
-      <img src="img/cube.gif"><div>LOADING...</div>
-    </div>
     
+    <p class="tagline">Shareable JavaScript programs powered by <a href="http://npmjs.org" target="_blank"><span class="npm"></span></a> and <a href="http://browserify.org" target="_blank"><span class="browserify"></span></a></p>
+
     <select class="actionsMenu" value="Actions" tabindex="1">
       <option value="noop" selected="selected">Actions</option>
       <option value="save">Save Gist</option>
@@ -37,6 +35,15 @@
     </div>
     <div id="paint" class="large hidden">
     </div>
+    
+    <div class="spinner hidden">
+      <div class="rect1"></div>
+      <div class="rect2"></div>
+      <div class="rect3"></div>
+      <div class="rect4"></div>
+      <div class="rect5"></div>
+    </div>
+    
     <div id="edit" class="large">
       <div id="share" class="hidden">
         <p id="shareDisabled">You have to save your project before you can embed it.</p>
@@ -53,10 +60,7 @@
           <a class="requirebin-link" target="_blank"><div class="requirebin-badge"></div></a>
         </div>
       </div>
-      <div id="howto" class="">
-        <p>Shareable JavaScript programs using modules from <a href="http://npmjs.org" target="_blank"><span class="npm"></span></a>.
-        </p>
-
+      <div id="howto" class="hidden">
         <p>Node.js style modular code gets transformed into code that can run client-side using <a href="http://browserify.org/" target="_blank">browserify</a> via <a target="_blank" href="http://wzrd.in.nyud.net/" target="_blank">browserify-cdn</a>.</p>
                 
         <p>Want to see an example? <a target="_blank" href="/?gist=juliangruber/6264704">requirebin.com/?gist=juliangruber/6264704</a></p>
@@ -72,7 +76,7 @@
           <a href="http://thenounproject.com/noun/recycle-bin/#icon-No12230" target="_blank">Recycle Bin</a> icon designed by <a href="http://thenounproject.com/jjaysonn" target="_blank">jayson lim</a> from The Noun Project
         </div>
       </div>
-      <div class="packagejson">
+      <div class="packagejson hidden">
         <h6>Modules In Use</h6>
         <div id="tagsinput" class="tagsinput" />
           <div class="tagsinput-add">No Modules Required Yet</div>

@@ -35,9 +35,6 @@ a { cursor: pointer; cursor: hand; }
   bottom: 0;
 }
 .hidden { visibility: hidden; display: none; }
-.loading { margin: 10px 0; position: absolute; left: 210px; z-index: 5; overflow: auto; width: 120px; }
-.loading * { float: left; line-height: 32px;}
-.loading img { margin-right: 10px }
 
 .btn-toolbar .btn {
   padding-top: 9px !important;
@@ -93,6 +90,8 @@ body > pre { display: none }
 /* codemirror */
 .CodeMirror { font-size:12px; }
 
+.tagline { margin-top: 9px; float: left;}
+
 .npm {
   background: url(../img/npm.png);
   width: 38px;
@@ -100,6 +99,16 @@ body > pre { display: none }
   display: inline-block;
   position: relative;
   top: 4px;
+}
+
+.browserify {
+  background: url(../img/browserify.png);
+  background-size: 75px 22.5px;
+  width: 75px;
+  height: 22.5px;
+  display: inline-block;
+  position: relative;
+  top: 7px;
 }
 
 .view-icon {
@@ -169,4 +178,60 @@ body > pre { display: none }
   top:5px;
   left:50%;
   margin-left:-200px;
+}
+
+/* spinkit */
+
+.spinner {
+  float: right;
+  margin: 10px;
+  width: 50px;
+  height: 30px;
+  text-align: center;
+  font-size: 10px;
+}
+
+.spinner > div {
+  background-color: #333;
+  height: 100%;
+  width: 6px;
+  display: inline-block;
+  
+  -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+  animation: stretchdelay 1.2s infinite ease-in-out;
+}
+
+.spinner .rect2 {
+  -webkit-animation-delay: -1.1s;
+  animation-delay: -1.1s;
+}
+
+.spinner .rect3 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+.spinner .rect4 {
+  -webkit-animation-delay: -0.9s;
+  animation-delay: -0.9s;
+}
+
+.spinner .rect5 {
+  -webkit-animation-delay: -0.8s;
+  animation-delay: -0.8s;
+}
+
+@-webkit-keyframes stretchdelay {
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) }  
+  20% { -webkit-transform: scaleY(1.0) }
+}
+
+@keyframes stretchdelay {
+  0%, 40%, 100% { 
+    transform: scaleY(0.4);
+    -webkit-transform: scaleY(0.4);
+  } 20% {
+    transform: scaleY(1.0);
+    -webkit-transform: scaleY(1.0);
+  }
 }

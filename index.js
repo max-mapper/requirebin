@@ -43,7 +43,7 @@ function initialize() {
   var currentHost = parsedURL.protocol + '//' + parsedURL.hostname
   if (parsedURL.port) currentHost += ':' + parsedURL.port
 
-  var loadingClass = elementClass(document.querySelector('.loading'))
+  var loadingClass = elementClass(document.querySelector('.spinner'))
   var outputEl = document.querySelector('#play')
   var editorEl = document.querySelector('#edit')
   var painterEl = document.querySelector('#paint')
