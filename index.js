@@ -8,6 +8,7 @@ var url = require('url')
 var request = require('browser-request')
 var detective = require('detective')
 var md5 = require('md5-jkmyers')
+var keydown = require('keydown')
 
 var cookie = require('./cookie')
 var Github = require('github-api')
@@ -228,7 +229,7 @@ function initialize() {
         }, 0)
       }
     })
-  
+    
     $('.run-btn').click(function(e) {
       e.preventDefault()
       $('a[data-action="play"]').click()
@@ -242,7 +243,7 @@ function initialize() {
     })
 
     var actions = {
-      play: function() {
+      play: function(pressed) {
         var code = editor.editor.getValue()
         if (codeMD5 && codeMD5 === md5(code)) {
           loadingClass.add('hidden')
@@ -315,6 +316,9 @@ function initialize() {
         localStorage.setItem('code', code)
       })
     }
+    
+    keydown(['<meta>', '<enter>']).on('pressed', actions.play)
+    keydown(['<control>', '<enter>']).on('pressed', actions.play)
     
     // loads the current code on load
     setTimeout(function() {
