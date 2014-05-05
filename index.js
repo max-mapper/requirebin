@@ -44,12 +44,12 @@ function initialize() {
   if (parsedURL.port) currentHost += ':' + parsedURL.port
 
   var loadingClass = elementClass(document.querySelector('.spinner'))
+  var runButton = elementClass(document.querySelector('.play-button'))
   var outputEl = document.querySelector('#play')
   var editorEl = document.querySelector('#edit')
 
   function authenticate() {
     if (cookie.get('oauth-token')) {
-      console.log('LOGGEDIN = true')
       return loggedIn = true
     }
     var match = window.location.href.match(/\?code=([a-z0-9]*)/)
@@ -197,11 +197,16 @@ function initialize() {
     var share = document.querySelector('#share')
     var controlsContainer = document.querySelector('#controls')
     var textBox = document.querySelector("#shareTextarea")
+    
+    document.querySelector('.hide-howto').addEventListener('click', function() {
+      elementClass(howTo).add('hidden')
+    })
 
     var packageTags = $(".tagsinput")
 
     editor.on('valid', function(valid) {
       if (!valid) return
+      runButton.remove('hidden')
       packageTags.html('')
       var modules = detective(editor.editor.getValue())
       modules.map(function(module) {
@@ -310,6 +315,11 @@ function initialize() {
         localStorage.setItem('code', code)
       })
     }
+    
+    // loads the current code on load
+    setTimeout(function() {
+      actions.play()
+    }, 500)
 
   })
 }

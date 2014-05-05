@@ -137,7 +137,7 @@ body > pre { display: none }
 #shareTextarea { font-size: 12px; }
 #shareInstructions p { margin: 5px 0; }
 
-#howto, #share, .packagejson { padding: 20px; float: right; width: 30%; overflow: auto; border-left: 1px solid #eee; border-bottom: 1px solid #eee; }
+#howto, #share, .packagejson { padding: 20px; position: absolute; right: 0; background: white; width: 40%; overflow: auto; border-left: 1px solid #eee; border-bottom: 1px solid #eee; }
 .packagejson { clear: both; }
 .packagejson .tagsinput .tag:hover { padding: 6px 13px 6px 19px; }
 .packagejson h6 { margin-top: 0; }

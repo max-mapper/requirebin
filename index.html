@@ -24,21 +24,10 @@
     </select>
     
     <div class="actionsButtons">
-      <a data-action="play" class="btn btn-block btn-lg btn-primary"><i class="fui-eye-16"></i>Run</a>
+      <a alt="CTRL+R" data-action="play" class="play-button hidden btn btn-block btn-lg btn-primary"><i class="fui-eye-16"></i>Rebuild</a>
     </div>
           
     <div id="play" class="right">
-    </div>
-    
-    <div class="spinner hidden">
-      <div class="rect1"></div>
-      <div class="rect2"></div>
-      <div class="rect3"></div>
-      <div class="rect4"></div>
-      <div class="rect5"></div>
-    </div>
-    
-    <div id="edit" class="left">
       <div id="share" class="hidden">
         <p id="shareDisabled">You have to save your project before you can embed it.</p>
         <div id="shareInstructions" class="hidden">
@@ -62,12 +51,13 @@
         <p>Here are <a href="https://gist.github.com/maxogden/9425694">a bunch more examples to play with</a>.</p>
         <p>Need HTML or CSS? Check out <a target="_blank" href="http://requirebin.com/?gist=maxogden/9842648">insert-css and domify</a>.</p>
         <p>The <span class="view-icon"></span> buttons run the code from the current bin.</p>
-        <div class="col-xs-3"><a class="run-btn btn btn-block btn-lg btn-primary"><i class="fui-eye-16"></i> Run This Bin</a></div>
+        <div class="col-xs-3"><a class="run-btn btn btn-block btn-lg btn-primary"><i class="fui-eye-16"></i> Rebuild</a></div>
         
         <div class="attribution">
           <p>View the source or report bugs <a href="https://github.com/maxogden/requirebin" target="_blank">on Github</a>.</p>
           <p><strong>Need Help?</strong> Send a question via tweet to <a href="http://twitter.com/maxogden" target="_blank">@maxogden</a></p>
-          <a href="http://thenounproject.com/noun/recycle-bin/#icon-No12230" target="_blank">Recycle Bin</a> icon designed by <a href="http://thenounproject.com/jjaysonn" target="_blank">jayson lim</a> from The Noun Project
+          <p><a href="http://thenounproject.com/noun/recycle-bin/#icon-No12230" target="_blank">Recycle Bin</a> icon designed by <a href="http://thenounproject.com/jjaysonn" target="_blank">jayson lim</a></p>
+          <p><a href="#" class="hide-howto">hide these instructions</a></p>
         </div>
       </div>
       <div class="packagejson hidden">
@@ -77,8 +67,42 @@
         </div>
       </div>
     </div>
-<script id="template" type="text/template">// try requiring some modules from NPM and then hit Run
-require('cat-picture')</script>
+    
+    <div class="spinner hidden">
+      <div class="rect1"></div>
+      <div class="rect2"></div>
+      <div class="rect3"></div>
+      <div class="rect4"></div>
+      <div class="rect5"></div>
+    </div>
+    
+    <div id="edit" class="left">
+
+    </div>
+<script id="template" type="text/template">// example using the raf module from npm. try changing some values!
+var requestAnimationFrame = require("raf")
+var canvas = document.createElement("canvas")
+
+canvas.width = 500
+canvas.height = 500
+
+document.body.appendChild(canvas)
+
+var context = canvas.getContext("2d")
+var zoom = 10
+
+requestAnimationFrame(canvas, function onFrame(delta) {
+  zoom += delta * 0.025
+  
+  context.clearRect (0, 0, 500, 500)
+  context.beginPath()
+  context.arc(256 - zoom / Math.sqrt(2), 256 - zoom / Math.sqrt(2), zoom, 0, 2 * Math.PI, false)
+  context.closePath()
+  context.lineWidth = 5
+  context.strokeStyle = '#003300'
+  context.stroke()
+})
+</script>
   <script type="text/javascript" src="flatui-deps.js"></script>
   <script type="text/javascript" src="bundle.js"></script>
   <script type="text/javascript" src="uglifyjs2-browser.js"></script>
