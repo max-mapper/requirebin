@@ -48,6 +48,7 @@ function initialize() {
   var runButton = elementClass(document.querySelector('.play-button'))
   var outputEl = document.querySelector('#play')
   var editorEl = document.querySelector('#edit')
+  var cacheStateMessage = elementClass(document.querySelector('.cacheState'))
 
   function authenticate() {
     if (cookie.get('oauth-token')) {
@@ -244,6 +245,8 @@ function initialize() {
 
     var actions = {
       play: function(pressed) {
+        cacheStateMessage.add('hidden')
+        
         var code = editor.editor.getValue()
         if (codeMD5 && codeMD5 === md5(code)) {
           loadingClass.add('hidden')
@@ -251,6 +254,10 @@ function initialize() {
         } else {
           sandbox.bundle(code, packagejson.dependencies)
         }
+        
+        editor.once('change', function (e) {
+          cacheStateMessage.remove('hidden')
+        })
       },
 
       edit: function() {

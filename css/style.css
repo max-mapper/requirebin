@@ -22,6 +22,8 @@ a { cursor: pointer; cursor: hand; }
 .run-btn { line-height: 34px; }
 .run-btn i { position: relative; top: 1.5px; right: 2px; }
 
+.cacheState { float: right; line-height: 52px; margin-right: 10px; font-size: 11px; }
+
 .actionsMenu { width: 224px; float: right; margin: 5px 10px; }
 .actionsButtons { margin: 5px 0; float: right; }
 .actionsButtons i { position: relative; top: 1px; }
@@ -243,5 +245,11 @@ body > pre { display: none }
   } 20% {
     transform: scaleY(1.0);
     -webkit-transform: scaleY(1.0);
+  }
+}
+
+@media only screen and (max-width: 1150px) {
+  .tagline {
+    display: none;
   }
 }
