@@ -93,7 +93,7 @@ document.body.appendChild(canvas)
 var context = canvas.getContext("2d")
 var zoom = 10
 
-requestAnimationFrame(canvas, function onFrame(delta) {
+requestAnimationFrame(function onFrame(delta) {
   zoom += delta * 0.025
   
   context.clearRect (0, 0, 500, 500)
@@ -103,6 +103,8 @@ requestAnimationFrame(canvas, function onFrame(delta) {
   context.lineWidth = 5
   context.strokeStyle = '#003300'
   context.stroke()
+
+  requestAnimationFrame(onFrame);
 })
 </script>
   <script type="text/javascript" src="flatui-deps.js"></script>
