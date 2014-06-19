@@ -94,7 +94,7 @@ var context = canvas.getContext("2d")
 var zoom = 10
 
 requestAnimationFrame(function onFrame(delta) {
-  zoom += delta * 0.025
+  zoom += delta * 0.0001
   
   context.clearRect (0, 0, 500, 500)
   context.beginPath()
