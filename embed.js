@@ -1,5 +1,6 @@
 var jsonp = require('jsonp')
 var url = require('url')
+var getGistFiles = require('./get-gist-files')
 
 var parsedURL = url.parse(window.location.href, true)
 var gistID = parsedURL.query.gist
@@ -14,15 +15,19 @@ loadFromAPI(gistID)
 function loadFromAPI(gistID) {
   jsonp('https://api.github.com/gists/' + gistID, function(err, gist) {
     if (err) return console.log(err)
-    var files = gist.data.files
-    
-    var headFile = files['page-head.html']
-    if (!headFile) headFile = files['head.html']
-    if (headFile) var head = headFile.content
-    
-    var minFile = files['minified.js']
-    if (minFile) var bundle = minFile.content
-    render(head, bundle)
+
+    getGistFiles(gist, ['page-head.html', 'head.html', 'minified.js'], function(err) {
+      if (err) return console.log(err)
+      var files = gist.data.files
+      
+      var headFile = files['page-head.html']
+      if (!headFile) headFile = files['head.html']
+      if (headFile) var head = headFile.content
+      
+      var minFile = files['minified.js']
+      if (minFile) var bundle = minFile.content
+      render(head, bundle)
+    });
   })
 }
 
