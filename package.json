@@ -22,7 +22,8 @@
     "javascript-editor": "~0.2.1",
     "jsonp": "0.0.3",
     "keydown": "~0.0.3",
-    "md5-jkmyers": "~0.0.1"
+    "md5-jkmyers": "~0.0.1",
+    "nets": "^1.0.0"
   },
   "engines": {
     "node": ">=0.8.x"
