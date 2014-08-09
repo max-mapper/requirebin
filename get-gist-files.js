@@ -9,7 +9,7 @@ function getGistFiles(gist, keys, callback) {
     return files[name] && files[name].truncated
   })
   
-  if (truncated.length === 0) return callback(err)
+  if (truncated.length === 0) return callback(null, gist)
   
   getNext()
   
