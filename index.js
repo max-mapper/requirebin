@@ -360,20 +360,27 @@ function tooltipMessage(cssClass, text) {
   if (message) {
     message.classList.remove('hidden')
     message.classList.add('alert-'+cssClass)
-    message.innerHTML = text
+    var messageText = message.querySelector('.text')
+    messageText.innerHTML = text
   } else {
     message = document.createElement('div')
     message.classList.add('alert')
+    message.classList.add('alert-'+cssClass)
+
+    var messageText = document.createElement('span')
+    messageText.classList.add('text')
+    messageText.innerHTML = text
+
     var close = document.createElement('span')
-    close.classList.add('pull-right')
+    close.classList.add('close')
     close.innerHTML = '&times;'
     close.addEventListener('click', function () {
       this.parentNode.classList.add('hidden')
     }, false)
-    message.classList.add('alert-'+cssClass)
-    message.innerHTML = text
-    document.querySelector('body').appendChild(message)
+
     message.appendChild(close)
+    message.appendChild(messageText)
+    document.querySelector('body').appendChild(message)
   }
 }
 
