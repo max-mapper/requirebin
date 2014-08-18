@@ -50,6 +50,9 @@ function initialize() {
   var editorEl = document.querySelector('#edit')
   var cacheStateMessage = elementClass(document.querySelector('.cacheState'))
 
+  if (cookie.get('uglify-on-save') == null)
+    cookie.set('uglify-on-save', true)
+
   function authenticate() {
     if (cookie.get('oauth-token')) {
       return loggedIn = true
@@ -77,10 +80,13 @@ function initialize() {
     var entry = editor.editor.getValue()
     opts = opts || {}
     opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
+    opts.minify = 'minify' in opts ? opts.minify : true
 
     sandbox.bundle(entry, packagejson.dependencies)
     sandbox.on('bundleEnd', function(bundle) {
-      var minified = uglify.minify(bundle.script, {fromString: true, mangle: false, compress: false})
+      var minified = bundle.script
+      if (opts.minify)
+        minified = uglify.minify(bundle.script, {fromString: true, mangle: false, compress: false}).code
       
       var gist = {
        "description": "requirebin sketch",
@@ -90,7 +96,7 @@ function initialize() {
              "content": entry
            },
            "minified.js": {
-             "content": minified.code
+             "content": minified
            },
            "page-head.html": {
              "content": bundle.head
@@ -271,7 +277,7 @@ function initialize() {
       },
 
       save: function() {
-        if (loggedIn) return saveGist(gistID)
+        if (loggedIn) return saveGist(gistID, { 'minify': Boolean(cookie.get('uglify-on-save')) })
         loadingClass.remove('hidden')
         var loginURL = "https://github.com/login/oauth/authorize" +
           "?client_id=" + config.GITHUB_CLIENT +
@@ -281,7 +287,7 @@ function initialize() {
       },
 
       'save-private': function() {
-        if (loggedIn) return saveGist(gistID, { 'isPublic': false })
+        if (loggedIn) return saveGist(gistID, { 'isPublic': false, 'minify': Boolean(cookie.get('uglify-on-save')) })
         loadingClass.remove('hidden')
 
         var loginURL = "https://github.com/login/oauth/authorize" +
@@ -291,6 +297,14 @@ function initialize() {
           "&redirect_uri=" + currentHost
 
         window.location.href = loginURL
+      },
+
+      'uglify-on-save': function () {
+        var uglifyOnSave = !Boolean(cookie.get('uglify-on-save'))
+        cookie.set('uglify-on-save', uglifyOnSave)
+
+        var msg = 'Uglify on save <strong>' + (uglifyOnSave ? 'enabled' : 'disabled') + '</strong>'
+        tooltipMessage('info', msg)
       },
 
       howto: function() {
