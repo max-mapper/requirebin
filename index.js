@@ -50,9 +50,6 @@ function initialize() {
   var editorEl = document.querySelector('#edit')
   var cacheStateMessage = elementClass(document.querySelector('.cacheState'))
 
-  if (cookie.get('uglify-on-save') == null)
-    cookie.set('uglify-on-save', true)
-
   function authenticate() {
     if (cookie.get('oauth-token')) {
       return loggedIn = true
@@ -161,6 +158,15 @@ function initialize() {
     cb(false, defaultCode)
   }
 
+  var uglifyOption = null;
+  function setUglifyOnSave(enabled) {
+    cookie.set('uglify-on-save', enabled)
+
+    if (!uglifyOption) uglifyOption = document.querySelector('.actionsMenu [data-dk-dropdown-value=uglify-on-save]')
+    var msg = uglifyOption.textContent.split(' ').slice(1).join(' ')
+    uglifyOption.textContent = (enabled ? 'Disable' : 'Enable') + ' ' + msg
+  }
+
   loadCode(function(err, code) {
     if (err) return alert(JSON.stringify(err))
 
@@ -249,6 +255,10 @@ function initialize() {
       if (action in actions) actions[action]()
     })
 
+    var uglifyOnSave = cookie.get('uglify-on-save')
+    if (uglifyOnSave == null) setUglifyOnSave(true)
+    else setUglifyOnSave(Boolean(uglifyOnSave))
+
     var actions = {
       play: function(pressed) {
         cacheStateMessage.add('hidden')
@@ -301,10 +311,7 @@ function initialize() {
 
       'uglify-on-save': function () {
         var uglifyOnSave = !Boolean(cookie.get('uglify-on-save'))
-        cookie.set('uglify-on-save', uglifyOnSave)
-
-        var msg = 'Uglify on save <strong>' + (uglifyOnSave ? 'enabled' : 'disabled') + '</strong>'
-        tooltipMessage('info', msg)
+        setUglifyOnSave(uglifyOnSave)
       },
 
       howto: function() {
