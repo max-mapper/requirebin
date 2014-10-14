@@ -372,9 +372,10 @@ function getGistID(parsedURL) {
   if (!gistID) return
   if (gistID.indexOf('/') > -1) {
     var parts = gistID.split('/')
+    var user = parts.shift()
     gistID = {
-      user: parts[0],
-      id: parts[1]
+      user: user,
+      id: parts.join('/')
     }
   } else {
     gistID = {
