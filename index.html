@@ -81,31 +81,8 @@
     <div id="edit" class="left">
 
     </div>
-<script id="template" type="text/template">// example using the raf module from npm. try changing some values!
-var requestAnimationFrame = require("raf")
-var canvas = document.createElement("canvas")
-
-canvas.width = 500
-canvas.height = 500
-
-document.body.appendChild(canvas)
-
-var context = canvas.getContext("2d")
-var zoom = 10
-
-requestAnimationFrame(function onFrame(delta) {
-  zoom += delta * 0.0001
-  
-  context.clearRect (0, 0, 500, 500)
-  context.beginPath()
-  context.arc(256 - zoom / Math.sqrt(2), 256 - zoom / Math.sqrt(2), zoom, 0, 2 * Math.PI, false)
-  context.closePath()
-  context.lineWidth = 5
-  context.strokeStyle = '#003300'
-  context.stroke()
-
-  requestAnimationFrame(onFrame);
-})
+<script id="template" type="text/template">// require() some stuff from npm (like you were using browserify)
+// and then hit Rebuild to run it on the right
 </script>
   <script type="text/javascript" src="flatui-deps.js"></script>
   <script type="text/javascript" src="bundle.js"></script>
