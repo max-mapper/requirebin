@@ -77,10 +77,13 @@ function initialize() {
     var entry = editor.editor.getValue()
     opts = opts || {}
     opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
+    opts.minify = 'minify' in opts ? opts.minify : true
 
     sandbox.bundle(entry, packagejson.dependencies)
     sandbox.on('bundleEnd', function(bundle) {
-      var minified = uglify.minify(bundle.script, {fromString: true, mangle: false, compress: false})
+      var minified = bundle.script
+      if (opts.minify)
+        minified = uglify.minify(bundle.script, {fromString: true, mangle: false, compress: false}).code
       
       var gist = {
        "description": "requirebin sketch",
@@ -90,7 +93,7 @@ function initialize() {
              "content": entry
            },
            "minified.js": {
-             "content": minified.code
+             "content": minified
            },
            "page-head.html": {
              "content": bundle.head
@@ -153,6 +156,15 @@ function initialize() {
 
     var defaultCode = document.querySelector('#template').innerText
     cb(false, defaultCode)
+  }
+
+  var uglifyOption = null;
+  function setUglifyOnSave(enabled) {
+    cookie.set('uglify-on-save', enabled)
+
+    if (!uglifyOption) uglifyOption = document.querySelector('.actionsMenu [data-dk-dropdown-value=uglify-on-save]')
+    var msg = uglifyOption.textContent.split(' ').slice(1).join(' ')
+    uglifyOption.textContent = (enabled ? 'Disable' : 'Enable') + ' ' + msg
   }
 
   loadCode(function(err, code) {
@@ -243,6 +255,10 @@ function initialize() {
       if (action in actions) actions[action]()
     })
 
+    var uglifyOnSave = cookie.get('uglify-on-save')
+    if (uglifyOnSave == null) setUglifyOnSave(true)
+    else setUglifyOnSave(Boolean(uglifyOnSave))
+
     var actions = {
       play: function(pressed) {
         cacheStateMessage.add('hidden')
@@ -271,7 +287,7 @@ function initialize() {
       },
 
       save: function() {
-        if (loggedIn) return saveGist(gistID)
+        if (loggedIn) return saveGist(gistID, { 'minify': Boolean(cookie.get('uglify-on-save')) })
         loadingClass.remove('hidden')
         var loginURL = "https://github.com/login/oauth/authorize" +
           "?client_id=" + config.GITHUB_CLIENT +
@@ -281,7 +297,7 @@ function initialize() {
       },
 
       'save-private': function() {
-        if (loggedIn) return saveGist(gistID, { 'isPublic': false })
+        if (loggedIn) return saveGist(gistID, { 'isPublic': false, 'minify': Boolean(cookie.get('uglify-on-save')) })
         loadingClass.remove('hidden')
 
         var loginURL = "https://github.com/login/oauth/authorize" +
@@ -291,6 +307,11 @@ function initialize() {
           "&redirect_uri=" + currentHost
 
         window.location.href = loginURL
+      },
+
+      'uglify-on-save': function () {
+        var uglifyOnSave = !Boolean(cookie.get('uglify-on-save'))
+        setUglifyOnSave(uglifyOnSave)
       },
 
       howto: function() {
@@ -346,20 +367,27 @@ function tooltipMessage(cssClass, text) {
   if (message) {
     message.classList.remove('hidden')
     message.classList.add('alert-'+cssClass)
-    message.innerHTML = text
+    var messageText = message.querySelector('.text')
+    messageText.innerHTML = text
   } else {
     message = document.createElement('div')
     message.classList.add('alert')
+    message.classList.add('alert-'+cssClass)
+
+    var messageText = document.createElement('span')
+    messageText.classList.add('text')
+    messageText.innerHTML = text
+
     var close = document.createElement('span')
-    close.classList.add('pull-right')
+    close.classList.add('close')
     close.innerHTML = '&times;'
     close.addEventListener('click', function () {
       this.parentNode.classList.add('hidden')
     }, false)
-    message.classList.add('alert-'+cssClass)
-    message.innerHTML = text
-    document.querySelector('body').appendChild(message)
+
     message.appendChild(close)
+    message.appendChild(messageText)
+    document.querySelector('body').appendChild(message)
   }
 }
 
