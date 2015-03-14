@@ -30,6 +30,21 @@ a { cursor: pointer; cursor: hand; }
 .actionsButtons .fui-new-16 { margin-right: 7px; }
 .actionsButtons .fui-eye-16 { margin-right: 5px; }
 .actionsButtons a.btn-primary { padding: 9px 14px 10px 14px; }
+
+.clear-float {
+  overflow: hidden;
+}
+
+.editor-picker {
+  border-right: 1px solid #eee;
+  float: right;
+  margin: 5px 10px;
+}
+.editor-picker a {
+  float: left;
+  padding: 10px;
+}
+
 .large {
   position: absolute;
   top: 50px;
@@ -51,33 +66,14 @@ a { cursor: pointer; cursor: hand; }
   right: 0;
   bottom: 0;
 }
-
-.editor-wrap {
-  position: relative;
-}
-
-.half-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 50%;
-}
-
-.half-bottom {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  height: 50%;
-}
-
 .hidden { visibility: hidden; display: none; }
 
 .tagsinput { height: auto; }
 .tag a { color: white; text-decoration: none; }
 
-.editor, #play { z-index: 1; border-top: 1px solid #eee; border-right: 1px solid #eee; }
+.require-bin-editor, #play { z-index: 1; border-top: 1px solid #eee; border-right: 1px solid #eee; }
 
-.editor .CodeMirror {
+.require-bin-editor .CodeMirror {
 
   height: 100%;
   font-size: 12px;
@@ -86,36 +82,30 @@ a { cursor: pointer; cursor: hand; }
 
 }
 
-.editor .CodeMirror-scroll {
+.require-bin-editor .CodeMirror-scroll {
 
   height: 100%;
 
 }
 
-.editor .CodeMirror div.CodeMirror-selected {
+.require-bin-editor .CodeMirror div.CodeMirror-selected {
 
   background: rgba(0,0,0,0.1);
 
 }
 
-.editor .CodeMirror-focused div.CodeMirror-selected {
+.require-bin-editor .CodeMirror-focused div.CodeMirror-selected {
 
   background: rgba(0,0,255,0.1);
 
 }
 
-.editor .CodeMirror .errorLine {
-
-  background: rgba(255,0,0,0.25);
-
-}
-
 body { margin: 0; padding: 0; }
 
-html, body, .editor { height: 100%; }
+html, body { height: 100%; }
 
 /* mysterious pre */
-body > pre { display: none } 
+body > pre { display: none }
 
 /* codemirror */
 .CodeMirror { font-size:12px; }
@@ -152,7 +142,7 @@ body > pre { display: none }
 }
 
 
-.editor .CodeMirror .errorLine { background: rgba(255,0,0,0.25); }
+.require-bin-editor .CodeMirror .errorLine { background: rgba(255,0,0,0.25); }
 
 #play { overflow: hidden }
 #shareTextarea { font-size: 12px; }
@@ -227,7 +217,7 @@ body > pre { display: none }
   height: 100%;
   width: 6px;
   display: inline-block;
-  
+
   -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
   animation: stretchdelay 1.2s infinite ease-in-out;
 }
@@ -253,12 +243,12 @@ body > pre { display: none }
 }
 
 @-webkit-keyframes stretchdelay {
-  0%, 40%, 100% { -webkit-transform: scaleY(0.4) }  
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
   20% { -webkit-transform: scaleY(1.0) }
 }
 
 @keyframes stretchdelay {
-  0%, 40%, 100% { 
+  0%, 40%, 100% {
     transform: scaleY(0.4);
     -webkit-transform: scaleY(0.4);
   } 20% {

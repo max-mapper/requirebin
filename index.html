@@ -4,10 +4,10 @@
     <title>RequireBin</title>
     <meta charset="utf-8">
     <link rel='shortcut icon' href="favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" type="text/css" href="css/codemirror.css"/>
-    <link rel="stylesheet" type="text/css" href="css/theme.css"/>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="flatui/css/flat-ui.css">
+    <link rel="stylesheet" type="text/css" href="css/codemirror.css"/>
+    <link rel="stylesheet" type="text/css" href="css/theme.css"/>
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
   </head>
   <body>
@@ -22,12 +22,27 @@
       <option value="howto">See instructions</option>
       <option value="share">Share/Embed</option>
     </select>
-    
+
     <div class="actionsButtons">
-      <a title="COMMAND+ENTER or CTRL+ENTER" data-action="play" class="play-button hidden btn btn-block btn-lg btn-primary"><i class="fui-eye-16"></i>Rebuild</a>
+      <a title="COMMAND+ENTER or CTRL+ENTER" data-action="play" class="play-button hidden btn btn-block btn-lg btn-primary">
+          <i class="fui-eye-16"></i>Rebuild
+      </a>
     </div>
-    
-    <span class="cacheState hidden">Code has been edited since last build</span>
+
+		<!--file selector-->
+		<div class="editor-picker btn-group">
+			<a class="btn btn-lg" data-editor="head">
+				head
+			</a>
+			<a class="btn btn-lg" data-editor="body">
+				body
+			</a>
+			<a class="btn btn-lg" data-editor="bundle">
+				bundle
+			</a>
+		</div>
+
+		<span class="cacheState hidden">Code has been edited since last build</span>
     
     <div id="play" class="right">
       <div id="share" class="hidden">
@@ -78,9 +93,10 @@
       <div class="rect5"></div>
     </div>
     
-    <!-- javascript editors -->
-    <div id="edit-bundle" class="editor left"></div>
-    <div id="edit-body" class="hidden editor left"></div>
+    <!-- editors -->
+    <div id="edit-head" class="require-bin-editor left hidden"></div>
+    <div id="edit-body" class="require-bin-editor left hidden"></div>
+    <div id="edit-bundle" class="require-bin-editor left"></div>
 
 <script id="bundle-template" type="text/template">// require() some stuff from npm (like you were using browserify)
 // and then hit Rebuild to run it on the right

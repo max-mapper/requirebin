@@ -52,6 +52,7 @@ function initialize() {
   var loadingClass = elementClass(document.querySelector('.spinner'))
   var runButton = elementClass(document.querySelector('.play-button'))
   var outputEl = document.querySelector('#play')
+  var editorHeadEl = document.querySelector('#edit-head')
   var editorBodyEl = document.querySelector('#edit-body')
   var editorEl = document.querySelector('#edit-bundle')
   var cacheStateMessage = elementClass(document.querySelector('.cacheState'))
@@ -140,11 +141,13 @@ function initialize() {
   function loadCode(cb) {
     var bundleCode;
     var bodyCode;
+    var headCode;
 
     function invokeCallback() {
       cb(false, {
         bundle: bundleCode,
-        body: bodyCode
+        body: bodyCode,
+        head: headCode
       });
     }
 
@@ -155,8 +158,9 @@ function initialize() {
         if (err) return cb(err)
         var json = gist.data
         if (!json.files || !json.files['index.js']) return cb({error: 'no index.js in this gist', json: json})
+        headCode = json.files['page-head.html'].content
+        bodyCode = json.files['page-body.html'].content
         bundleCode = json.files['index.js'].content
-        bodyCode = json.files['body.html'].content
         var pj = json.files['package.json']
         if (pj) {
           try { pj = JSON.parse(pj.content) }
@@ -183,15 +187,23 @@ function initialize() {
       container: editorEl,
       lineWrapping: true
     })
+    bundleEditor.name = 'bundle';
     var bodyEditor = htmlEditor.factory({
+      name: 'body',
       container: editorBodyEl
     })
+    var headEditor = htmlEditor.factory({
+      name: 'head',
+      container: editorHeadEl
+    })
 
-    editors.bundle = bundleEditor
-    editors.body = bodyEditor
+    editors.head = headEditor;
+    editors.bundle = bundleEditor;
+    editors.body = bodyEditor;
 
     if (code.bundle) bundleEditor.setValue(code.bundle)
     if (code.body) bodyEditor.setValue(code.body)
+    if (code.head) headEditor.setValue(code.head)
 
     var sandboxOpts = {
       cdn: config.BROWSERIFYCDN,
@@ -328,6 +340,21 @@ function initialize() {
       }
     }
 
+    // changes the active editor
+    var $editors = $('.require-bin-editor');
+    var $editorLinks = $('.editor-picker a');
+    $editorLinks.click(function () {
+      var self = $(this);
+      // there's only one primary button
+      var editorName = self.attr('data-editor');
+      $editorLinks.removeClass('btn-primary');
+      self.addClass('btn-primary');
+      // hide all editors and show the active editor
+      $editors.addClass('hidden');
+      $('#edit-' + editorName).removeClass('hidden');
+      editors[editorName].editor.refresh();
+    });
+
     sandbox.on('bundleStart', function() {
       loadingClass.remove('hidden')
     })
@@ -342,12 +369,13 @@ function initialize() {
     })
 
     if (!gistID) {
-      bundleEditor.on("change", function() {
-        var bundleCode = bundleEditor.editor.getValue()
-        var bodyCode = bodyEditor.editor.getValue();
-        localStorage.setItem('bundleCode', bundleCode)
-        localStorage.setItem('bodyCode', bodyCode)
-      })
+      [bundleEditor, headEditor, bodyEditor].forEach(function (editor) {
+        editor.on('change', function () {
+          var code = editor.editor.getValue();
+          // e.g. bundleCode, headCode, bodyCode
+          localStorage.setItem(editor.name + 'Code', code);
+        });
+      });
     }
 
     keydown(['<meta>', '<enter>']).on('pressed', actions.play)
