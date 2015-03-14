@@ -252,6 +252,7 @@ function initialize() {
     bundleEditor.on('valid', function(valid) {
       if (!valid) return
       runButton.remove('hidden')
+      $('.editor-picker').removeClass('hidden');
       packageTags.html('')
       var modules = detective(bundleEditor.editor.getValue())
       modules.map(function(module) {
@@ -294,9 +295,8 @@ function initialize() {
         if (codeMD5 && codeMD5 === md5(code)) {
           loadingClass.add('hidden')
           sandbox.iframe.setHTML('<script type="text/javascript" src="embed-bundle.js"></script>')
-        } else {
-          doBundle();
         }
+        doBundle();
 
         bundleEditor.once('change', function (e) {
           cacheStateMessage.remove('hidden')
