@@ -51,14 +51,33 @@ a { cursor: pointer; cursor: hand; }
   right: 0;
   bottom: 0;
 }
+
+.editor-wrap {
+  position: relative;
+}
+
+.half-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 50%;
+}
+
+.half-bottom {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 50%;
+}
+
 .hidden { visibility: hidden; display: none; }
 
 .tagsinput { height: auto; }
 .tag a { color: white; text-decoration: none; }
 
-#edit, #play { z-index: 1; border-top: 1px solid #eee; border-right: 1px solid #eee; }
+.editor, #play { z-index: 1; border-top: 1px solid #eee; border-right: 1px solid #eee; }
 
-#edit .CodeMirror {
+.editor .CodeMirror {
 
   height: 100%;
   font-size: 12px;
@@ -67,25 +86,25 @@ a { cursor: pointer; cursor: hand; }
 
 }
 
-#edit .CodeMirror-scroll {
+.editor .CodeMirror-scroll {
 
   height: 100%;
 
 }
 
-#edit .CodeMirror div.CodeMirror-selected {
+.editor .CodeMirror div.CodeMirror-selected {
 
   background: rgba(0,0,0,0.1);
 
 }
 
-#edit .CodeMirror-focused div.CodeMirror-selected {
+.editor .CodeMirror-focused div.CodeMirror-selected {
 
   background: rgba(0,0,255,0.1);
 
 }
 
-#edit .CodeMirror .errorLine {
+.editor .CodeMirror .errorLine {
 
   background: rgba(255,0,0,0.25);
 
@@ -93,7 +112,7 @@ a { cursor: pointer; cursor: hand; }
 
 body { margin: 0; padding: 0; }
 
-html, body, #editor { height: 100%; }
+html, body, .editor { height: 100%; }
 
 /* mysterious pre */
 body > pre { display: none } 
@@ -133,7 +152,7 @@ body > pre { display: none }
 }
 
 
-#editor .CodeMirror .errorLine { background: rgba(255,0,0,0.25); }
+.editor .CodeMirror .errorLine { background: rgba(255,0,0,0.25); }
 
 #play { overflow: hidden }
 #shareTextarea { font-size: 12px; }

@@ -10,10 +10,15 @@ var detective = require('detective')
 var md5 = require('md5-jkmyers')
 var keydown = require('keydown')
 
+var htmlEditor = require('./lib/htmlEditor')
+
 var cookie = require('./cookie')
 var Github = require('github-api')
 var Gist = require('./github-gist.js')
 var uglify = require('uglify-js')
+
+// globals set on window for the editor
+var editors = window.editors = {};
 
 initialize()
 
@@ -26,7 +31,7 @@ function initialize() {
   var codeMD5, sandbox
   var packagejson = {"name": "requirebin-sketch", "version": "1.0.0"}
   window.packagejson = packagejson
-  
+
   var loggedIn = false
   if (cookie.get('oauth-token')) loggedIn = true
 
@@ -40,14 +45,15 @@ function initialize() {
   }
 
   if (parsedURL.query.code) return authenticate()
-  
+
   var currentHost = parsedURL.protocol + '//' + parsedURL.hostname
   if (parsedURL.port) currentHost += ':' + parsedURL.port
 
   var loadingClass = elementClass(document.querySelector('.spinner'))
   var runButton = elementClass(document.querySelector('.play-button'))
   var outputEl = document.querySelector('#play')
-  var editorEl = document.querySelector('#edit')
+  var editorBodyEl = document.querySelector('#edit-body')
+  var editorEl = document.querySelector('#edit-bundle')
   var cacheStateMessage = elementClass(document.querySelector('.cacheState'))
 
   function authenticate() {
@@ -71,17 +77,17 @@ function initialize() {
 
     return true
   }
-  
+
   function saveGist(id, opts) {
     if (loadingClass) loadingClass.remove('hidden')
-    var entry = editor.editor.getValue()
+    var entry = editors.bundle.editor.getValue()
     opts = opts || {}
     opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
 
     sandbox.bundle(entry, packagejson.dependencies)
     sandbox.on('bundleEnd', function(bundle) {
       var minified = uglify.minify(bundle.script, {fromString: true, mangle: false, compress: false})
-      
+
       var gist = {
        "description": "requirebin sketch",
          "public": opts.isPublic,
@@ -94,6 +100,9 @@ function initialize() {
            },
            "page-head.html": {
              "content": bundle.head
+           },
+           "page-body.html": {
+             "content": bundle.body
            },
            "requirebin.md": {
              "content": "made with [requirebin](http://requirebin.com)"
@@ -129,6 +138,16 @@ function initialize() {
   }
 
   function loadCode(cb) {
+    var bundleCode;
+    var bodyCode;
+
+    function invokeCallback() {
+      cb(false, {
+        bundle: bundleCode,
+        body: bodyCode
+      });
+    }
+
     if (gistID) {
       loadingClass.remove('hidden')
       return githubGist.load(gistID, function(err, gist) {
@@ -136,43 +155,50 @@ function initialize() {
         if (err) return cb(err)
         var json = gist.data
         if (!json.files || !json.files['index.js']) return cb({error: 'no index.js in this gist', json: json})
-        var code = json.files['index.js'].content
+        bundleCode = json.files['index.js'].content
+        bodyCode = json.files['body.html'].content
         var pj = json.files['package.json']
         if (pj) {
           try { pj = JSON.parse(pj.content) }
           catch (e) { pj = false }
           if (pj) packagejson.dependencies = pj.dependencies
         }
-        codeMD5 = md5(code)
-        cb(false, code)
+        codeMD5 = md5(bundleCode)
+        invokeCallback()
       })
     }
 
-    var stored = localStorage.getItem('code')
-    if (stored) return cb(false, stored)
-
-    var defaultCode = document.querySelector('#template').innerText
-    cb(false, defaultCode)
+    bundleCode = localStorage.getItem('bundleCode')
+    bodyCode = localStorage.getItem('bodyCode')
+    if (!bundleCode) {
+      bundleCode = document.querySelector('#bundle-template').innerText
+    }
+    invokeCallback();
   }
 
   loadCode(function(err, code) {
     if (err) return alert(JSON.stringify(err))
 
-    var editor = jsEditor({
+    var bundleEditor = jsEditor({
       container: editorEl,
       lineWrapping: true
     })
+    var bodyEditor = htmlEditor.factory({
+      container: editorBodyEl
+    })
 
-    window.editor = editor
+    editors.bundle = bundleEditor
+    editors.body = bodyEditor
 
-    if (code) editor.setValue(code)
+    if (code.bundle) bundleEditor.setValue(code.bundle)
+    if (code.body) bodyEditor.setValue(code.body)
 
     var sandboxOpts = {
       cdn: config.BROWSERIFYCDN,
       container: outputEl,
       iframeStyle: "body, html { height: 100%; width: 100%; }"
     }
-    
+
     if (parsedURL.query.save) {
       // use memdown here to avoid indexeddb transaction bugs :(
       sandboxOpts.cacheOpts = { inMemory: true }
@@ -183,7 +209,7 @@ function initialize() {
     } else {
       sandbox = createSandbox(sandboxOpts)
     }
-    
+
     sandbox.on('modules', function(modules) {
       if (!modules) return
       packagejson.dependencies = {}
@@ -192,25 +218,23 @@ function initialize() {
         packagejson.dependencies[mod.name] = mod.version
       })
     })
-    
+
     if (parsedURL.query.save) return
-    
+
     var howTo = document.querySelector('#howto')
     var share = document.querySelector('#share')
-    var controlsContainer = document.querySelector('#controls')
-    var textBox = document.querySelector("#shareTextarea")
-    
+
     document.querySelector('.hide-howto').addEventListener('click', function() {
       elementClass(howTo).add('hidden')
     })
 
     var packageTags = $(".tagsinput")
 
-    editor.on('valid', function(valid) {
+    bundleEditor.on('valid', function(valid) {
       if (!valid) return
       runButton.remove('hidden')
       packageTags.html('')
-      var modules = detective(editor.editor.getValue())
+      var modules = detective(bundleEditor.editor.getValue())
       modules.map(function(module) {
         var tag =
           '<span class="tag"><a target="_blank" href="http://npmjs.org/' +
@@ -230,7 +254,7 @@ function initialize() {
         }, 0)
       }
     })
-    
+
     $('.run-btn').click(function(e) {
       e.preventDefault()
       $('a[data-action="play"]').click()
@@ -246,16 +270,16 @@ function initialize() {
     var actions = {
       play: function(pressed) {
         cacheStateMessage.add('hidden')
-        
-        var code = editor.editor.getValue()
+
+        var code = bundleEditor.editor.getValue()
         if (codeMD5 && codeMD5 === md5(code)) {
           loadingClass.add('hidden')
           sandbox.iframe.setHTML('<script type="text/javascript" src="embed-bundle.js"></script>')
         } else {
           sandbox.bundle(code, packagejson.dependencies)
         }
-        
-        editor.once('change', function (e) {
+
+        bundleEditor.once('change', function (e) {
           cacheStateMessage.remove('hidden')
         })
       },
@@ -318,15 +342,17 @@ function initialize() {
     })
 
     if (!gistID) {
-      editor.on("change", function() {
-        var code = editor.editor.getValue()
-        localStorage.setItem('code', code)
+      bundleEditor.on("change", function() {
+        var bundleCode = bundleEditor.editor.getValue()
+        var bodyCode = bodyEditor.editor.getValue();
+        localStorage.setItem('bundleCode', bundleCode)
+        localStorage.setItem('bodyCode', bodyCode)
       })
     }
-    
+
     keydown(['<meta>', '<enter>']).on('pressed', actions.play)
     keydown(['<control>', '<enter>']).on('pressed', actions.play)
-    
+
     // loads the current code on load
     setTimeout(function() {
       actions.play()
