@@ -57,6 +57,12 @@ function initialize() {
   var editorEl = document.querySelector('#edit-bundle')
   var cacheStateMessage = elementClass(document.querySelector('.cacheState'))
 
+  function doBundle() {
+    sandbox.iframeHead = editors.head.getValue();
+    sandbox.iframeBody = editors.body.getValue();
+    sandbox.bundle(editors.bundle.getValue(), packagejson.dependencies);
+  }
+
   function authenticate() {
     if (cookie.get('oauth-token')) {
       return loggedIn = true
@@ -85,7 +91,7 @@ function initialize() {
     opts = opts || {}
     opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
 
-    sandbox.bundle(entry, packagejson.dependencies)
+    doBundle();
     sandbox.on('bundleEnd', function(bundle) {
       var minified = uglify.minify(bundle.script, {fromString: true, mangle: false, compress: false})
 
@@ -100,10 +106,10 @@ function initialize() {
              "content": minified.code
            },
            "page-head.html": {
-             "content": bundle.head
+             "content": sandbox.iframeHead
            },
            "page-body.html": {
-             "content": bundle.body
+             "content": sandbox.iframeBody
            },
            "requirebin.md": {
              "content": "made with [requirebin](http://requirebin.com)"
@@ -172,11 +178,12 @@ function initialize() {
       })
     }
 
-    bundleCode = localStorage.getItem('bundleCode')
-    bodyCode = localStorage.getItem('bodyCode')
+    bundleCode = localStorage.getItem('bundleCode');
     if (!bundleCode) {
       bundleCode = document.querySelector('#bundle-template').innerText
     }
+    headCode = localStorage.getItem('headCode') || '';
+    bodyCode = localStorage.getItem('bodyCode') || '';
     invokeCallback();
   }
 
@@ -288,7 +295,7 @@ function initialize() {
           loadingClass.add('hidden')
           sandbox.iframe.setHTML('<script type="text/javascript" src="embed-bundle.js"></script>')
         } else {
-          sandbox.bundle(code, packagejson.dependencies)
+          doBundle();
         }
 
         bundleEditor.once('change', function (e) {
