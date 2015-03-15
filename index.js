@@ -56,7 +56,6 @@ function initialize() {
   var editorBodyEl = document.querySelector('#edit-body')
   var editorMetaEl = document.querySelector('#edit-meta')
   var editorEl = document.querySelector('#edit-bundle')
-  var cacheStateMessage = elementClass(document.querySelector('.cacheState'))
 
   function doBundle() {
     sandbox.iframeHead = editors.head.getValue();
@@ -197,25 +196,29 @@ function initialize() {
     })
     bundleEditor.name = 'bundle';
 
-    var metaEditor = jsEditor({
+    var metaEditor = htmlEditor.factory({
       // initial value is not important here, when the editor gets the focus
       // the content will be overwritten
       value: '',
+      name: 'meta',
+      mode: 'application/json',
       container: editorMetaEl,
       lineWrapping: true
     })
     metaEditor.on('afterFocus', function () {
       metaEditor.setValue(stringifyPackageJson());
     });
-    metaEditor.name = 'meta';
 
     // html editors
     var bodyEditor = htmlEditor.factory({
       name: 'body',
+      value: "<!-- contents of this file will be placed inside the <body> -->\n",
       container: editorBodyEl
     })
+    
     var headEditor = htmlEditor.factory({
       name: 'head',
+      value: "<!-- contents of this file will be placed inside the <head> -->\n",
       container: editorHeadEl
     })
 
@@ -224,9 +227,9 @@ function initialize() {
     editors.body = bodyEditor;
     activeEditor = editors.bundle = bundleEditor;
 
-    bundleEditor.setValue(code.bundle || '')
-    bodyEditor.setValue(code.body || '')
-    headEditor.setValue(code.head || '')
+    if (code.bundle) bundleEditor.setValue(code.bundle)
+    if (code.body) bodyEditor.setValue(code.body)
+    if (code.head) headEditor.setValue(code.head)
 
     var sandboxOpts = {
       cdn: config.BROWSERIFYCDN,
@@ -305,7 +308,7 @@ function initialize() {
 
     var actions = {
       play: function(pressed) {
-        cacheStateMessage.add('hidden')
+        runButton.add('disabled')
 
         var code = bundleEditor.editor.getValue()
         if (codeMD5 && codeMD5 === md5(code)) {
@@ -315,7 +318,7 @@ function initialize() {
         doBundle();
 
         bundleEditor.once('change', function (e) {
-          cacheStateMessage.remove('hidden')
+          runButton.remove('disabled')
         })
       },
 

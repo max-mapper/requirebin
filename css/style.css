@@ -17,6 +17,7 @@ a { cursor: pointer; cursor: hand; }
 #header .controls {
   float: right;
 }
+.play-button.disabled { background-color: #aaa; }
 .requirebin-badge { width: 100px; height: 100px; background: url(../badge.png) no-repeat 0 0; background-size: 100px 100px; z-index: 1000; }
 .col-xs-3 { width: 38%; padding-top: 10px; }
 .run-btn { line-height: 34px; }
