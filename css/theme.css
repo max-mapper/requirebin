@@ -1,3 +1,11 @@
+.CodeMirror {
+  /* Set height, width, borders, and global font properties here */
+  font-family:'Source Code Pro', 'Monaco', 'Consolas', monospace;
+  line-height:1.5em !important;
+  height:100%;
+  font-size:20px;
+}
+
 .cm-s-mistakes .cm-keyword {color: darkblue;}
 .cm-s-mistakes .cm-atom {color: darkred;}
 .cm-s-mistakes .cm-number {color: darkred;}

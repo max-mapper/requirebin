@@ -4,10 +4,10 @@
     <title>RequireBin</title>
     <meta charset="utf-8">
     <link rel='shortcut icon' href="favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" type="text/css" href="css/codemirror.css"/>
-    <link rel="stylesheet" type="text/css" href="css/theme.css"/>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="flatui/css/flat-ui.css">
+    <link rel="stylesheet" type="text/css" href="css/codemirror.css"/>
+    <link rel="stylesheet" type="text/css" href="css/theme.css"/>
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
   </head>
   <body>
@@ -22,13 +22,29 @@
       <option value="howto">See instructions</option>
       <option value="share">Share/Embed</option>
     </select>
-    
+
     <div class="actionsButtons">
-      <a title="COMMAND+ENTER or CTRL+ENTER" data-action="play" class="play-button hidden btn btn-block btn-lg btn-primary"><i class="fui-eye-16"></i>Rebuild</a>
+      <a title="COMMAND+ENTER or CTRL+ENTER" data-action="play" class="play-button hidden btn btn-block btn-lg btn-primary">
+          <i class="fui-eye-16"></i>Run Code
+      </a>
     </div>
-    
-    <span class="cacheState hidden">Code has been edited since last build</span>
-    
+
+		<!--file selector-->
+		<div class="editor-picker hidden btn-group">
+			<a class="btn btn-lg btn-primary" data-editor="bundle">
+				code
+			</a>
+			<a class="btn btn-lg" data-editor="head">
+				&lt;head&gt;
+			</a>
+			<a class="btn btn-lg" data-editor="body">
+				&lt;body&gt;
+			</a>
+			<a class="btn btn-lg" data-editor="meta">
+				package.json
+			</a>
+		</div>
+
     <div id="play" class="right">
       <div id="share" class="hidden">
         <p id="shareDisabled">You have to save your project before you can embed it.</p>
@@ -53,7 +69,7 @@
         <p>Here are <a href="https://gist.github.com/maxogden/9425694">a bunch more examples to play with</a>.</p>
         <p>Need HTML or CSS? Check out <a target="_blank" href="http://requirebin.com/?gist=maxogden/9842648">insert-css and domify</a>.</p>
         <p>The <span class="view-icon"></span> buttons run the code from the current bin.</p>
-        <div class="col-xs-3"><a class="run-btn btn btn-block btn-lg btn-primary"><i class="fui-eye-16"></i> Rebuild</a></div>
+        <div class="col-xs-3"><a class="run-btn btn btn-block btn-lg btn-primary"><i class="fui-eye-16"></i> Run Code</a></div>
         
         <div class="attribution">
           <p>View the source or report bugs <a href="https://github.com/maxogden/requirebin" target="_blank">on Github</a>.</p>
@@ -78,11 +94,14 @@
       <div class="rect5"></div>
     </div>
     
-    <div id="edit" class="left">
+    <!-- editors -->
+    <div id="edit-meta" class="require-bin-editor left hidden"></div>
+    <div id="edit-head" class="require-bin-editor left hidden"></div>
+    <div id="edit-body" class="require-bin-editor left hidden"></div>
+    <div id="edit-bundle" class="require-bin-editor left"></div>
 
-    </div>
-<script id="template" type="text/template">// require() some stuff from npm (like you were using browserify)
-// and then hit Rebuild to run it on the right
+<script id="bundle-template" type="text/template">// require() some stuff from npm (like you were using browserify)
+// and then hit Run Code to run it on the right
 </script>
   <script type="text/javascript" src="flatui-deps.js"></script>
   <script type="text/javascript" src="bundle.js"></script>

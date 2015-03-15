@@ -10,10 +10,15 @@ var detective = require('detective')
 var md5 = require('md5-jkmyers')
 var keydown = require('keydown')
 
+var htmlEditor = require('./lib/htmlEditor')
+
 var cookie = require('./cookie')
-var Github = require('github-api')
 var Gist = require('./github-gist.js')
 var uglify = require('uglify-js')
+
+// globals set on window for the editor
+var editors = window.editors = {};
+var activeEditor;
 
 initialize()
 
@@ -26,7 +31,7 @@ function initialize() {
   var codeMD5, sandbox
   var packagejson = {"name": "requirebin-sketch", "version": "1.0.0"}
   window.packagejson = packagejson
-  
+
   var loggedIn = false
   if (cookie.get('oauth-token')) loggedIn = true
 
@@ -40,15 +45,23 @@ function initialize() {
   }
 
   if (parsedURL.query.code) return authenticate()
-  
+
   var currentHost = parsedURL.protocol + '//' + parsedURL.hostname
   if (parsedURL.port) currentHost += ':' + parsedURL.port
 
   var loadingClass = elementClass(document.querySelector('.spinner'))
   var runButton = elementClass(document.querySelector('.play-button'))
   var outputEl = document.querySelector('#play')
-  var editorEl = document.querySelector('#edit')
-  var cacheStateMessage = elementClass(document.querySelector('.cacheState'))
+  var editorHeadEl = document.querySelector('#edit-head')
+  var editorBodyEl = document.querySelector('#edit-body')
+  var editorMetaEl = document.querySelector('#edit-meta')
+  var editorEl = document.querySelector('#edit-bundle')
+
+  function doBundle() {
+    sandbox.iframeHead = editors.head.getValue();
+    sandbox.iframeBody = editors.body.getValue();
+    sandbox.bundle(editors.bundle.getValue(), packagejson.dependencies);
+  }
 
   function authenticate() {
     if (cookie.get('oauth-token')) {
@@ -71,45 +84,51 @@ function initialize() {
 
     return true
   }
-  
+
+  function stringifyPackageJson() {
+    return JSON.stringify(packagejson, null, '  ');
+  }
+
   function saveGist(id, opts) {
     if (loadingClass) loadingClass.remove('hidden')
-    var entry = editor.editor.getValue()
+    var entry = editors.bundle.editor.getValue()
     opts = opts || {}
     opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
 
-    sandbox.bundle(entry, packagejson.dependencies)
+    doBundle();
     sandbox.on('bundleEnd', function(bundle) {
       var minified = uglify.minify(bundle.script, {fromString: true, mangle: false, compress: false})
-      
+
       var gist = {
-       "description": "requirebin sketch",
-         "public": opts.isPublic,
-         "files": {
-           "index.js": {
-             "content": entry
-           },
-           "minified.js": {
-             "content": minified.code
-           },
-           "page-head.html": {
-             "content": bundle.head
-           },
-           "requirebin.md": {
-             "content": "made with [requirebin](http://requirebin.com)"
-           },
-           "package.json": {
-             "content": JSON.stringify(packagejson, null, '  ')
-           }
-         }
+        "description": "requirebin sketch",
+        "public": opts.isPublic,
+        "files": {
+          "index.js": {
+            "content": entry
+          },
+          "minified.js": {
+            "content": minified.code
+          },
+          "requirebin.md": {
+            "content": "made with [requirebin](http://requirebin.com)"
+          },
+          "package.json": {
+            "content": stringifyPackageJson()
+          }
+        }
       }
+
+      // the gist can't have empty fields or the github api request will fail
+      if (sandbox.iframeHead) gist["page-head.html"] = {"content": sandbox.iframeHead}
+      if (sandbox.iframeHead) gist["page-body.html"] = {"content": sandbox.iframeBody}
+
       githubGist.save(gist, id, opts, function(err, newGist) {
         var newGistId = newGist.id
         if (newGist.user && newGist.user.login) {
           newGistId = newGist.user.login + '/' + newGistId
         }
         loadingClass.add('hidden')
-        if (err) alert(err.toString());
+        if (err) alert(err.toString())
         if (newGistId) window.location.href = "/?gist=" + newGistId
       })
     })
@@ -129,6 +148,12 @@ function initialize() {
   }
 
   function loadCode(cb) {
+    var code = {};
+
+    function invokeCallback() {
+      cb(false, code);
+    }
+
     if (gistID) {
       loadingClass.remove('hidden')
       return githubGist.load(gistID, function(err, gist) {
@@ -136,43 +161,82 @@ function initialize() {
         if (err) return cb(err)
         var json = gist.data
         if (!json.files || !json.files['index.js']) return cb({error: 'no index.js in this gist', json: json})
-        var code = json.files['index.js'].content
+        var headHtml = json.files['page-head.html'] || {content: ""} 
+        var bodyHtml = json.files['page-body.html'] || {content: ""} 
+        code.head = headHtml.content
+        code.body = bodyHtml.content
+        code.bundle = json.files['index.js'].content
+        code.meta = json.files['package.json'].content
         var pj = json.files['package.json']
         if (pj) {
           try { pj = JSON.parse(pj.content) }
           catch (e) { pj = false }
           if (pj) packagejson.dependencies = pj.dependencies
         }
-        codeMD5 = md5(code)
-        cb(false, code)
+        codeMD5 = md5(code.bundle)
+        invokeCallback()
       })
     }
 
-    var stored = localStorage.getItem('code')
-    if (stored) return cb(false, stored)
-
-    var defaultCode = document.querySelector('#template').innerText
-    cb(false, defaultCode)
+    code.bundle = localStorage.getItem('bundleCode') ||
+      document.querySelector('#bundle-template').innerText
+    code.head = localStorage.getItem('headCode') || '';
+    code.body = localStorage.getItem('bodyCode') || '';
+    code.meta = localStorage.getItem('metaCode') || '';
+    invokeCallback();
   }
 
   loadCode(function(err, code) {
     if (err) return alert(JSON.stringify(err))
 
-    var editor = jsEditor({
+    // javascript editors
+    var bundleEditor = jsEditor({
       container: editorEl,
       lineWrapping: true
     })
+    bundleEditor.name = 'bundle';
 
-    window.editor = editor
+    var metaEditor = htmlEditor.factory({
+      // initial value is not important here, when the editor gets the focus
+      // the content will be overwritten
+      value: '',
+      name: 'meta',
+      mode: 'application/json',
+      container: editorMetaEl,
+      lineWrapping: true
+    })
+    metaEditor.on('afterFocus', function () {
+      metaEditor.setValue(stringifyPackageJson());
+    });
 
-    if (code) editor.setValue(code)
+    // html editors
+    var bodyEditor = htmlEditor.factory({
+      name: 'body',
+      value: "<!-- contents of this file will be placed inside the <body> -->\n",
+      container: editorBodyEl
+    })
+    
+    var headEditor = htmlEditor.factory({
+      name: 'head',
+      value: "<!-- contents of this file will be placed inside the <head> -->\n",
+      container: editorHeadEl
+    })
+
+    editors.meta = metaEditor;
+    editors.head = headEditor;
+    editors.body = bodyEditor;
+    activeEditor = editors.bundle = bundleEditor;
+
+    if (code.bundle) bundleEditor.setValue(code.bundle)
+    if (code.body) bodyEditor.setValue(code.body)
+    if (code.head) headEditor.setValue(code.head)
 
     var sandboxOpts = {
       cdn: config.BROWSERIFYCDN,
       container: outputEl,
       iframeStyle: "body, html { height: 100%; width: 100%; }"
     }
-    
+
     if (parsedURL.query.save) {
       // use memdown here to avoid indexeddb transaction bugs :(
       sandboxOpts.cacheOpts = { inMemory: true }
@@ -183,7 +247,7 @@ function initialize() {
     } else {
       sandbox = createSandbox(sandboxOpts)
     }
-    
+
     sandbox.on('modules', function(modules) {
       if (!modules) return
       packagejson.dependencies = {}
@@ -192,25 +256,24 @@ function initialize() {
         packagejson.dependencies[mod.name] = mod.version
       })
     })
-    
+
     if (parsedURL.query.save) return
-    
+
     var howTo = document.querySelector('#howto')
     var share = document.querySelector('#share')
-    var controlsContainer = document.querySelector('#controls')
-    var textBox = document.querySelector("#shareTextarea")
-    
+
     document.querySelector('.hide-howto').addEventListener('click', function() {
       elementClass(howTo).add('hidden')
     })
 
     var packageTags = $(".tagsinput")
 
-    editor.on('valid', function(valid) {
+    bundleEditor.on('valid', function(valid) {
       if (!valid) return
       runButton.remove('hidden')
+      $('.editor-picker').removeClass('hidden');
       packageTags.html('')
-      var modules = detective(editor.editor.getValue())
+      var modules = detective(bundleEditor.editor.getValue())
       modules.map(function(module) {
         var tag =
           '<span class="tag"><a target="_blank" href="http://npmjs.org/' +
@@ -230,7 +293,7 @@ function initialize() {
         }, 0)
       }
     })
-    
+
     $('.run-btn').click(function(e) {
       e.preventDefault()
       $('a[data-action="play"]').click()
@@ -245,18 +308,17 @@ function initialize() {
 
     var actions = {
       play: function(pressed) {
-        cacheStateMessage.add('hidden')
-        
-        var code = editor.editor.getValue()
+        runButton.add('disabled')
+
+        var code = bundleEditor.editor.getValue()
         if (codeMD5 && codeMD5 === md5(code)) {
           loadingClass.add('hidden')
           sandbox.iframe.setHTML('<script type="text/javascript" src="embed-bundle.js"></script>')
-        } else {
-          sandbox.bundle(code, packagejson.dependencies)
         }
-        
-        editor.once('change', function (e) {
-          cacheStateMessage.remove('hidden')
+        doBundle();
+
+        bundleEditor.once('change', function (e) {
+          runButton.remove('disabled')
         })
       },
 
@@ -304,6 +366,25 @@ function initialize() {
       }
     }
 
+    // changes the active editor
+    var $editors = $('.require-bin-editor');
+    var $editorLinks = $('.editor-picker a');
+    $editorLinks.click(function () {
+      var self = $(this);
+      var editor;
+      // there's only one primary button
+      var editorName = self.attr('data-editor');
+      $editorLinks.removeClass('btn-primary');
+      self.addClass('btn-primary');
+      // hide all editors and show the active editor
+      $editors.addClass('hidden');
+      $('#edit-' + editorName).removeClass('hidden');
+      activeEditor = editors[editorName];
+      activeEditor.emit('afterFocus');
+      editor = activeEditor.editor;
+      editor.refresh();
+    });
+
     sandbox.on('bundleStart', function() {
       loadingClass.remove('hidden')
     })
@@ -318,15 +399,25 @@ function initialize() {
     })
 
     if (!gistID) {
-      editor.on("change", function() {
-        var code = editor.editor.getValue()
-        localStorage.setItem('code', code)
-      })
+      [bundleEditor, headEditor, bodyEditor].forEach(function (editor) {
+        editor.on('change', function () {
+          var code = editor.editor.getValue();
+          // e.g. bundleCode, headCode, bodyCode
+          localStorage.setItem(editor.name + 'Code', code);
+        });
+      });
+
+      metaEditor.on('change', function () {
+        var code = metaEditor.editor.getValue();
+        try {
+          window.packagejson = packagejson = JSON.parse(code);
+        } catch (e) { }
+      });
     }
-    
+
     keydown(['<meta>', '<enter>']).on('pressed', actions.play)
     keydown(['<control>', '<enter>']).on('pressed', actions.play)
-    
+
     // loads the current code on load
     setTimeout(function() {
       actions.play()
