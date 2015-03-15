@@ -11,14 +11,15 @@ var md5 = require('md5-jkmyers')
 var keydown = require('keydown')
 
 var htmlEditor = require('./lib/htmlEditor')
+var beautify = require('js-beautify').js_beautify;
 
 var cookie = require('./cookie')
-var Github = require('github-api')
 var Gist = require('./github-gist.js')
 var uglify = require('uglify-js')
 
 // globals set on window for the editor
 var editors = window.editors = {};
+var activeEditor;
 
 initialize()
 
@@ -54,6 +55,7 @@ function initialize() {
   var outputEl = document.querySelector('#play')
   var editorHeadEl = document.querySelector('#edit-head')
   var editorBodyEl = document.querySelector('#edit-body')
+  var editorMetaEl = document.querySelector('#edit-meta')
   var editorEl = document.querySelector('#edit-bundle')
   var cacheStateMessage = elementClass(document.querySelector('.cacheState'))
 
@@ -145,16 +147,10 @@ function initialize() {
   }
 
   function loadCode(cb) {
-    var bundleCode;
-    var bodyCode;
-    var headCode;
+    var code = {};
 
     function invokeCallback() {
-      cb(false, {
-        bundle: bundleCode,
-        body: bodyCode,
-        head: headCode
-      });
+      cb(false, code);
     }
 
     if (gistID) {
@@ -164,37 +160,50 @@ function initialize() {
         if (err) return cb(err)
         var json = gist.data
         if (!json.files || !json.files['index.js']) return cb({error: 'no index.js in this gist', json: json})
-        headCode = json.files['page-head.html'].content
-        bodyCode = json.files['page-body.html'].content
-        bundleCode = json.files['index.js'].content
+        code.head = json.files['page-head.html'].content
+        code.body = json.files['page-body.html'].content
+        code.bundle = json.files['index.js'].content
+        code.meta = json.files['package.json'].content
         var pj = json.files['package.json']
         if (pj) {
           try { pj = JSON.parse(pj.content) }
           catch (e) { pj = false }
           if (pj) packagejson.dependencies = pj.dependencies
         }
-        codeMD5 = md5(bundleCode)
+        codeMD5 = md5(code.bundle)
         invokeCallback()
       })
     }
 
-    bundleCode = localStorage.getItem('bundleCode');
-    if (!bundleCode) {
-      bundleCode = document.querySelector('#bundle-template').innerText
-    }
-    headCode = localStorage.getItem('headCode') || '';
-    bodyCode = localStorage.getItem('bodyCode') || '';
+    code.bundle = localStorage.getItem('bundleCode') ||
+      document.querySelector('#bundle-template').innerText
+    code.head = localStorage.getItem('headCode') || '';
+    code.body = localStorage.getItem('bodyCode') || '';
+    code.meta = localStorage.getItem('metaCode') || '';
     invokeCallback();
   }
 
   loadCode(function(err, code) {
     if (err) return alert(JSON.stringify(err))
 
+    // javascript editors
     var bundleEditor = jsEditor({
       container: editorEl,
       lineWrapping: true
     })
     bundleEditor.name = 'bundle';
+
+    var metaEditor = jsEditor({
+      value: JSON.stringify(packagejson),
+      container: editorMetaEl,
+      lineWrapping: true
+    })
+    metaEditor.on('afterFocus', function () {
+      metaEditor.setValue(JSON.stringify(packagejson));
+    });
+    metaEditor.name = 'meta';
+
+    // html editors
     var bodyEditor = htmlEditor.factory({
       name: 'body',
       container: editorBodyEl
@@ -204,13 +213,14 @@ function initialize() {
       container: editorHeadEl
     })
 
+    editors.meta = metaEditor;
     editors.head = headEditor;
-    editors.bundle = bundleEditor;
     editors.body = bodyEditor;
+    activeEditor = editors.bundle = bundleEditor;
 
-    if (code.bundle) bundleEditor.setValue(code.bundle)
-    if (code.body) bodyEditor.setValue(code.body)
-    if (code.head) headEditor.setValue(code.head)
+    bundleEditor.setValue(code.bundle || '')
+    bodyEditor.setValue(code.body || '')
+    headEditor.setValue(code.head || '')
 
     var sandboxOpts = {
       cdn: config.BROWSERIFYCDN,
@@ -352,6 +362,7 @@ function initialize() {
     var $editorLinks = $('.editor-picker a');
     $editorLinks.click(function () {
       var self = $(this);
+      var editor;
       // there's only one primary button
       var editorName = self.attr('data-editor');
       $editorLinks.removeClass('btn-primary');
@@ -359,7 +370,10 @@ function initialize() {
       // hide all editors and show the active editor
       $editors.addClass('hidden');
       $('#edit-' + editorName).removeClass('hidden');
-      editors[editorName].editor.refresh();
+      activeEditor = editors[editorName];
+      activeEditor.emit('afterFocus');
+      editor = activeEditor.editor;
+      editor.refresh();
     });
 
     sandbox.on('bundleStart', function() {
@@ -376,12 +390,20 @@ function initialize() {
     })
 
     if (!gistID) {
-      [bundleEditor, headEditor, bodyEditor].forEach(function (editor) {
+      // NOTE: meta editor is not saved in local storage
+      [bundleEditor, headEditor, bodyEditor, metaEditor].forEach(function (editor) {
         editor.on('change', function () {
           var code = editor.editor.getValue();
           // e.g. bundleCode, headCode, bodyCode
           localStorage.setItem(editor.name + 'Code', code);
         });
+      });
+
+      metaEditor.on('change', function () {
+        var code = metaEditor.editor.getValue();
+        try {
+          window.packagejson = packagejson = JSON.parse(code);
+        } catch (e) { }
       });
     }
 
