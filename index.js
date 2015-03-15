@@ -101,36 +101,35 @@ function initialize() {
       var minified = uglify.minify(bundle.script, {fromString: true, mangle: false, compress: false})
 
       var gist = {
-       "description": "requirebin sketch",
-         "public": opts.isPublic,
-         "files": {
-           "index.js": {
-             "content": entry
-           },
-           "minified.js": {
-             "content": minified.code
-           },
-           "page-head.html": {
-             "content": sandbox.iframeHead
-           },
-           "page-body.html": {
-             "content": sandbox.iframeBody
-           },
-           "requirebin.md": {
-             "content": "made with [requirebin](http://requirebin.com)"
-           },
-           "package.json": {
-             "content": stringifyPackageJson()
-           }
-         }
+        "description": "requirebin sketch",
+        "public": opts.isPublic,
+        "files": {
+          "index.js": {
+            "content": entry
+          },
+          "minified.js": {
+            "content": minified.code
+          },
+          "requirebin.md": {
+            "content": "made with [requirebin](http://requirebin.com)"
+          },
+          "package.json": {
+            "content": stringifyPackageJson()
+          }
+        }
       }
+
+      // the gist can't have empty fields or the github api request will fail
+      if (sandbox.iframeHead) gist["page-head.html"] = {"content": sandbox.iframeHead}
+      if (sandbox.iframeHead) gist["page-body.html"] = {"content": sandbox.iframeBody}
+
       githubGist.save(gist, id, opts, function(err, newGist) {
         var newGistId = newGist.id
         if (newGist.user && newGist.user.login) {
           newGistId = newGist.user.login + '/' + newGistId
         }
         loadingClass.add('hidden')
-        if (err) alert(err.toString());
+        if (err) alert(err.toString())
         if (newGistId) window.location.href = "/?gist=" + newGistId
       })
     })
@@ -163,8 +162,10 @@ function initialize() {
         if (err) return cb(err)
         var json = gist.data
         if (!json.files || !json.files['index.js']) return cb({error: 'no index.js in this gist', json: json})
-        code.head = json.files['page-head.html'].content
-        code.body = json.files['page-body.html'].content
+        var headHtml = json.files['page-head.html'] || {content: ""} 
+        var bodyHtml = json.files['page-body.html'] || {content: ""} 
+        code.head = headHtml.content
+        code.body = bodyHtml.content
         code.bundle = json.files['index.js'].content
         code.meta = json.files['package.json'].content
         var pj = json.files['package.json']
