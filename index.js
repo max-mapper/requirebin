@@ -11,7 +11,6 @@ var md5 = require('md5-jkmyers')
 var keydown = require('keydown')
 
 var htmlEditor = require('./lib/htmlEditor')
-var beautify = require('js-beautify').js_beautify;
 
 var cookie = require('./cookie')
 var Gist = require('./github-gist.js')
@@ -87,6 +86,10 @@ function initialize() {
     return true
   }
 
+  function stringifyPackageJson() {
+    return JSON.stringify(packagejson, null, '  ');
+  }
+
   function saveGist(id, opts) {
     if (loadingClass) loadingClass.remove('hidden')
     var entry = editors.bundle.editor.getValue()
@@ -117,7 +120,7 @@ function initialize() {
              "content": "made with [requirebin](http://requirebin.com)"
            },
            "package.json": {
-             "content": JSON.stringify(packagejson, null, '  ')
+             "content": stringifyPackageJson()
            }
          }
       }
@@ -194,12 +197,14 @@ function initialize() {
     bundleEditor.name = 'bundle';
 
     var metaEditor = jsEditor({
-      value: JSON.stringify(packagejson),
+      // initial value is not important here, when the editor gets the focus
+      // the content will be overwritten
+      value: '',
       container: editorMetaEl,
       lineWrapping: true
     })
     metaEditor.on('afterFocus', function () {
-      metaEditor.setValue(JSON.stringify(packagejson));
+      metaEditor.setValue(stringifyPackageJson());
     });
     metaEditor.name = 'meta';
 
@@ -390,8 +395,7 @@ function initialize() {
     })
 
     if (!gistID) {
-      // NOTE: meta editor is not saved in local storage
-      [bundleEditor, headEditor, bodyEditor, metaEditor].forEach(function (editor) {
+      [bundleEditor, headEditor, bodyEditor].forEach(function (editor) {
         editor.on('change', function () {
           var code = editor.editor.getValue();
           // e.g. bundleCode, headCode, bodyCode
