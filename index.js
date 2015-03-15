@@ -163,10 +163,11 @@ function initialize() {
         if (!json.files || !json.files['index.js']) return cb({error: 'no index.js in this gist', json: json})
         var headHtml = json.files['page-head.html'] || {content: ""} 
         var bodyHtml = json.files['page-body.html'] || {content: ""} 
+        var pkgJson = json.files['package.json'] || {content: ""}
         code.head = headHtml.content
         code.body = bodyHtml.content
+        code.meta = pkgJson.content
         code.bundle = json.files['index.js'].content
-        code.meta = json.files['package.json'].content
         var pj = json.files['package.json']
         if (pj) {
           try { pj = JSON.parse(pj.content) }
