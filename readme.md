@@ -35,6 +35,10 @@ npm start
 open http://localhost:8080
 ```
 
+### deploying
+
+if you are a collaborator and want to deploy code to `requirebin.com`, simply run `npm run deploy`
+
 ### contributing
 
 requirebin is an **OPEN Open Source Project**. This means that:
@@ -43,13 +47,13 @@ requirebin is an **OPEN Open Source Project**. This means that:
 
 See the [CONTRIBUTING.md](contributing.md) file for more details.
 
-### contributors
+## Collaborators
 
-requirebin is only possible due to the excellent work of the following contributors:
+requirebin is only possible due to the excellent work of the following collaborators:
 
-<table><tbody>
-<tr><th align="left">Max Ogden</th><td><a href="https://github.com/maxogden">GitHub/maxogden</a></td><td><a href="http://twitter.com/maxogden">Twitter/@maxogden</a></td></tr>
-<tr><th align="left">Matthew Hokanson</th><td><a href="https://github.com/h0ke/">GitHub/h0ke</a></td><td><a href="http://twitter.com/h0ke">Twitter/@h0ke</a></td></tr>
+<table><tbody><tr><th align="left">maxogden</th><td><a href="https://github.com/maxogden">GitHub/maxogden</a></td></tr>
+<tr><th align="left">h0ke</th><td><a href="https://github.com/h0ke">GitHub/h0ke</a></td></tr>
+<tr><th align="left">kumavis</th><td><a href="https://github.com/kumavis">GitHub/kumavis</a></td></tr>
 </tbody></table>
 
 

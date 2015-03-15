@@ -5,7 +5,16 @@
   "scripts": {
     "start": "beefy embed.js:embed-bundle.js index.js:bundle.js 8080",
     "build": "browserify embed.js -o embed-bundle.js && browserify index.js -o bundle.js --debug",
-    "minify": "cat bundle.js | uglifyjs -o bundle.js"
+    "minify": "cat bundle.js | uglifyjs -o bundle.js",
+    "deploy": "gh-pages-deploy"
+  },
+  "gh-pages-deploy": {
+    "cname": "requirebin.com",
+    "prep": [
+      "build",
+      "minify"
+    ],
+    "noprompt": false
   },
   "repository": {
     "type": "git",
@@ -33,6 +42,7 @@
     "browserify": "~2.23.1",
     "codemirror": "^5.0.0",
     "extend": "^2.0.0",
+    "gh-pages-deploy": "^0.3.0",
     "uglify-js": "~2.4.12"
   }
 }
