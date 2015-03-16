@@ -119,8 +119,8 @@ function initialize() {
       }
 
       // the gist can't have empty fields or the github api request will fail
-      if (sandbox.iframeHead) gist["page-head.html"] = {"content": sandbox.iframeHead}
-      if (sandbox.iframeHead) gist["page-body.html"] = {"content": sandbox.iframeBody}
+      if (sandbox.iframeHead) gist.files["page-head.html"] = {"content": sandbox.iframeHead}
+      if (sandbox.iframeHead) gist.files["page-body.html"] = {"content": sandbox.iframeBody}
 
       githubGist.save(gist, id, opts, function(err, newGist) {
         var newGistId = newGist.id
