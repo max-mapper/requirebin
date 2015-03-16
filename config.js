@@ -1,5 +1,5 @@
 module.exports = {
-  GITHUB_CLIENT: '77ca0223691ae7245419',
+  GITHUB_CLIENT: 'f7b1530b019cbb2619d5',
   GATEKEEPER: 'http://gatekeeper.maxogden.com',
   BROWSERIFYCDN: 'https://wzrd.in'
 }
