@@ -4,6 +4,8 @@ create programs in the browser using modules from NPM
 
 [![js-standard-style](https://raw.githubusercontent.com/feross/standard/master/badge.png)](https://github.com/feross/standard)
 
+[![Build Status](https://travis-ci.org/maxogden/requirebin.svg?branch=master)](https://travis-ci.org/maxogden/requirebin)
+
 the app itself is 100% client side (requirebin.com is hosted on github pages) but it relies on these three APIs:
 
 - https://github.com/substack/node-browserify
