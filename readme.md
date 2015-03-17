@@ -2,6 +2,8 @@
 
 create programs in the browser using modules from NPM
 
+[![js-standard-style](https://raw.githubusercontent.com/feross/standard/master/badge.png)](https://github.com/feross/standard)
+
 the app itself is 100% client side (requirebin.com is hosted on github pages) but it relies on these three APIs:
 
 - https://github.com/substack/node-browserify
@@ -24,7 +26,7 @@ browserify-cdn 8000
 
 ### set up gatekeeper (only if you want to publish gists in dev mode)
 
-1. make a new github oauth application and set the app URL and callback URL to `http://localhost:8080`
+1. make a new github oauth application and set the app URL and callback URL to `http://localhost:5000`
 2. [follow these instructions](https://github.com/prose/gatekeeper#setup-your-gatekeeper) to install and start gatekeeper on port 9999
 
 ### edit `config.js` to point to your endpoints
@@ -32,7 +34,7 @@ browserify-cdn 8000
 ```
 npm install
 npm start
-open http://localhost:8080
+open http://localhost:5000
 ```
 
 ### deploying

@@ -3,10 +3,11 @@
   "version": "0.1.1",
   "description": "create programs in the browser using modules from NPM",
   "scripts": {
-    "start": "beefy embed.js:embed-bundle.js index.js:bundle.js 8080",
+    "start": "beefy embed.js:embed-bundle.js index.js:bundle.js -p 5000",
     "build": "browserify embed.js -o embed-bundle.js && browserify index.js -o bundle.js --debug",
     "minify": "cat bundle.js | uglifyjs -o bundle.js",
-    "deploy": "gh-pages-deploy"
+    "deploy": "standard && gh-pages-deploy",
+    "test": "standard"
   },
   "gh-pages-deploy": {
     "cname": "requirebin.com",
@@ -15,6 +16,14 @@
       "minify"
     ],
     "noprompt": false
+  },
+  "standard": {
+    "ignore": [
+      "flatui-deps.js",
+      "uglifyjs2-browser.js",
+      "lib/codemirror_modes/**",
+      "flatui/**"
+    ]
   },
   "repository": {
     "type": "git",
@@ -43,6 +52,7 @@
     "codemirror": "^5.0.0",
     "extend": "^2.0.0",
     "gh-pages-deploy": "^0.3.0",
+    "standard": "^2.11.0",
     "uglify-js": "~2.4.12"
   }
 }

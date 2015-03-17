@@ -1,35 +1,35 @@
 var Github = require('github-api')
 var jsonp = require('jsonp')
 
-module.exports = exports = Gist = function(options){
+module.exports = Gist
+
+function Gist (options) {
   this.github = new Github(options)
 }
 
-Gist.prototype.save = function(gist, id, opts, callback) {
-
+Gist.prototype.save = function (gist, id, opts, callback) {
   var github = this.github
 
-  var complete = function(err, gistId){
-
-    if (err){
+  var complete = function (err, gistId) {
+    if (err) {
       if (typeof err !== 'string') err = JSON.stringify(err)
-      var err = Error(err)
+      err = Error(err)
     }
 
     callback(err, gistId)
-  };
+  }
 
   github.getGist(id).read(function (err) {
     if (err && err.error === 404) {
       // a gist with this id does not exist. create a new one:
-      github.getGist().create(gist, function(err, data) {
+      github.getGist().create(gist, function (err, data) {
         if (err) return complete(err)
         complete(null, data)
       })
       return
     }
     // check for non-404 error
-    if (err) return complete('get error' + JSON.stringify(err));
+    if (err) return complete('get error' + JSON.stringify(err))
 
     // The gist exists. Update it:
     github.getGist(id).update(gist, function (err, data) {
@@ -49,9 +49,9 @@ Gist.prototype.save = function(gist, id, opts, callback) {
       })
 
     })
-  });
+  })
 }
 
-Gist.prototype.load = function(id, callback) {
+Gist.prototype.load = function (id, callback) {
   return jsonp('https://api.github.com/gists/' + id, callback)
 }
