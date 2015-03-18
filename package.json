@@ -13,9 +13,9 @@
   "gh-pages-deploy": {
     "cname": "requirebin.com",
     "prep": [
+      "modifyconfig",
       "build",
-      "minify",
-      "modifyconfig"
+      "minify"
     ],
     "noprompt": false
   },
