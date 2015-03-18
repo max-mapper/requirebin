@@ -6,6 +6,7 @@
     "start": "beefy embed.js:embed-bundle.js index.js:bundle.js -p 5000",
     "build": "browserify embed.js -o embed-bundle.js && browserify index.js -o bundle.js --debug",
     "minify": "cat bundle.js | uglifyjs -o bundle.js",
+    "modifyconfig": "sed -i '.bak' 's/envs.dev/envs.production/' config.js && rm config.js.bak",
     "deploy": "standard && gh-pages-deploy",
     "test": "standard"
   },
@@ -13,7 +14,8 @@
     "cname": "requirebin.com",
     "prep": [
       "build",
-      "minify"
+      "minify",
+      "modifyconfig"
     ],
     "noprompt": false
   },
