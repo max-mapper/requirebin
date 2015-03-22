@@ -3,69 +3,62 @@ var $ = window.$
 
 var config = require('./config')
 var elementClass = require('element-class')
-var jsEditor = require('javascript-editor')
 var createSandbox = require('browser-module-sandbox')
 var url = require('url')
 var request = require('browser-request')
 var detective = require('detective')
-var md5 = require('md5-jkmyers')
 var keydown = require('keydown')
 
-var htmlEditor = require('./lib/htmlEditor')
-
-var cookie = require('./cookie')
-var Gist = require('./github-gist.js')
 var uglify = require('uglify-js')
-
-// globals set on window for the editor
-var editors = window.editors = {}
-var activeEditor
+var cookie = require('./lib/cookie')
+var Gist = require('./lib/github-gist.js')
+var ui = require('./lib/ui-controller')
+var editors = window.editors = require('./lib/editors')
 
 initialize()
 
 function initialize () {
+  var sandbox
+  var gistID
+
   var githubGist = new Gist({
     token: cookie.get('oauth-token'),
     auth: 'oauth'
   })
-
-  var codeMD5, sandbox
   var packagejson = {'name': 'requirebin-sketch', 'version': '1.0.0'}
+  var parsedURL = url.parse(window.location.href, true)
+  var gistTokens = Gist.fromUrl(parsedURL)
   window.packagejson = packagejson
+
+  // dom nodes
+  var outputEl = document.querySelector('#play')
+  var howTo = document.querySelector('#howto')
+  var share = document.querySelector('#share')
 
   var loggedIn = false
   if (cookie.get('oauth-token')) loggedIn = true
 
-  var parsedURL = url.parse(window.location.href, true)
-
-  var gistID = getGistID(parsedURL)
-  if (gistID) {
-    gistID = gistID.id
-    enableShare(gistID)
+  if (gistTokens) {
+    gistID = gistTokens.id
+    ui.enableShare(gistID)
   }
 
+  // special parameter `code` is used to perform the auth + redirection
+  // so no need to load the code
   if (parsedURL.query.code) return authenticate()
 
   var currentHost = parsedURL.protocol + '//' + parsedURL.hostname
   if (parsedURL.port) currentHost += ':' + parsedURL.port
 
-  var loadingClass = elementClass(document.querySelector('.spinner'))
-  var runButton = elementClass(document.querySelector('.play-button'))
-  var outputEl = document.querySelector('#play')
-  var editorHeadEl = document.querySelector('#edit-head')
-  var editorBodyEl = document.querySelector('#edit-body')
-  var editorMetaEl = document.querySelector('#edit-meta')
-  var editorEl = document.querySelector('#edit-bundle')
-
   function doBundle () {
-    sandbox.iframeHead = editors.head.getValue()
-    sandbox.iframeBody = editors.body.getValue()
-    sandbox.bundle(editors.bundle.getValue(), packagejson.dependencies)
+    sandbox.iframeHead = editors.get('head').getValue()
+    sandbox.iframeBody = editors.get('body').getValue()
+    sandbox.bundle(editors.get('bundle').getValue(), packagejson.dependencies)
   }
 
+  // todo: move to auth.js
   function authenticate () {
     if (cookie.get('oauth-token')) {
-      loggedIn = true
       return
     }
     var match = window.location.href.match(/\?code=([a-z0-9]*)/)
@@ -77,7 +70,6 @@ function initialize () {
       console.log('auth response', resp, data)
       if (data.token === 'undefined') return console.error('Auth failed to acquire token')
       cookie.set('oauth-token', data.token)
-      loggedIn = true
       // Adjust URL
       var regex = new RegExp('\\?code=' + match[1])
       window.location.href = window.location.href.replace(regex, '').replace('&state=', '') + '?save=true'
@@ -91,7 +83,7 @@ function initialize () {
   }
 
   function saveGist (id, opts) {
-    if (loadingClass) loadingClass.remove('hidden')
+    ui.$spinner.show()
     var entry = editors.bundle.editor.getValue()
     opts = opts || {}
     opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
@@ -128,24 +120,11 @@ function initialize () {
         if (newGist.user && newGist.user.login) {
           newGistId = newGist.user.login + '/' + newGistId
         }
-        loadingClass.add('hidden')
-        if (err) tooltipMessage('error', err.toString())
+        ui.$spinner.hide()
+        if (err) ui.tooltipMessage('error', err.toString())
         if (newGistId) window.location.href = '/?gist=' + newGistId
       })
     })
-  }
-
-  function enableShare (gistID) {
-    var textarea = document.querySelector('#shareTextarea')
-    var badgeTextarea = document.querySelector('#shareBadgeTextarea')
-    var markdownBadgeTextarea = document.querySelector('#markdownShareBadgeTextarea')
-    var instructions = document.querySelector('#shareInstructions')
-    var disabled = document.querySelector('#shareDisabled')
-    elementClass(disabled).add('hidden')
-    elementClass(instructions).remove('hidden')
-    textarea.value = '<iframe width="560" height="315" src="' + window.location.origin + '/embed?gist=' + gistID + '" frameborder="0" allowfullscreen></iframe>'
-    badgeTextarea.value = '<a class="requirebin-link" target="_blank" href="' + window.location.origin + '/?gist=' + gistID + '"><img src="' + window.location.origin + '/badge.png"></a>'
-    markdownBadgeTextarea.value = '[![view on requirebin](' + window.location.origin + '/badge.png)](' + window.location.origin + '/?gist=' + gistID + ')'
   }
 
   function loadCode (cb) {
@@ -156,9 +135,9 @@ function initialize () {
     }
 
     if (gistID) {
-      loadingClass.remove('hidden')
+      ui.$spinner.show()
       return githubGist.load(gistID, function (err, gist) {
-        loadingClass.add('hidden')
+        ui.$spinner.hide()
         if (err) return cb(err)
         var json = gist.data
         if (!json.files || !json.files['index.js']) return cb({error: 'no index.js in this gist', json: json})
@@ -178,7 +157,6 @@ function initialize () {
           }
           if (pj) packagejson.dependencies = pj.dependencies
         }
-        codeMD5 = md5(code.bundle)
         invokeCallback()
       })
     }
@@ -192,49 +170,29 @@ function initialize () {
   }
 
   loadCode(function (err, code) {
-    if (err) return tooltipMessage('error', JSON.stringify(err))
+    if (err) return ui.tooltipMessage('error', JSON.stringify(err))
 
-    // javascript editors
-    var bundleEditor = jsEditor({
-      container: editorEl,
-      lineWrapping: true
-    })
-    bundleEditor.name = 'bundle'
+    editors.init(code)
+    editors.setActive('bundle')
 
-    var metaEditor = htmlEditor.factory({
-      // initial value is not important here, when the editor gets the focus
-      // the content will be overwritten
-      value: '',
-      name: 'meta',
-      mode: 'application/json',
-      container: editorMetaEl,
-      lineWrapping: true
-    })
-    metaEditor.on('afterFocus', function () {
-      metaEditor.setValue(stringifyPackageJson())
-    })
-
-    // html editors
-    var bodyEditor = htmlEditor.factory({
-      name: 'body',
-      value: '<!-- contents of this file will be placed inside the <body> -->\n',
-      container: editorBodyEl
-    })
-
-    var headEditor = htmlEditor.factory({
-      name: 'head',
-      value: '<!-- contents of this file will be placed inside the <head> -->\n',
-      container: editorHeadEl
-    })
-
-    editors.meta = metaEditor
-    editors.head = headEditor
-    editors.body = bodyEditor
-    activeEditor = editors.bundle = bundleEditor
-
-    if (code.bundle) bundleEditor.setValue(code.bundle)
-    if (code.body) bodyEditor.setValue(code.body)
-    if (code.head) headEditor.setValue(code.head)
+    // actions done with the meta editor:
+    // - update the value of the editor whenever it's focused (it always has a valid json)
+    // - the runButton is disabled if the value it has is invalid
+    editors.get('meta')
+      .on('afterFocus', function (editor) {
+        editor.setValue(stringifyPackageJson())
+      })
+    editors.get('meta')
+      .on('change', function () {
+        var code = editors.get('meta').editor.getValue()
+        try {
+          ui.$runButton.removeClass('disabled')
+          window.packagejson = packagejson = JSON.parse(code)
+        } catch (e) {
+          // don't allow running the code if package.json is invalid
+          ui.$runButton.addClass('disabled')
+        }
+      })
 
     var sandboxOpts = {
       cdn: config.BROWSERIFYCDN,
@@ -264,21 +222,25 @@ function initialize () {
 
     if (parsedURL.query.save) return
 
-    var howTo = document.querySelector('#howto')
-    var share = document.querySelector('#share')
-
     document.querySelector('.hide-howto').addEventListener('click', function () {
       elementClass(howTo).add('hidden')
     })
 
     var packageTags = $('.tagsinput')
 
-    bundleEditor.on('valid', function (valid) {
+    // remove the `disabled` class from the save button when any editor is updated
+    editors.all(function (editor) {
+      editor.once('change', function (e) {
+        ui.$runButton.removeClass('disabled')
+      })
+    })
+
+    editors.get('bundle').on('valid', function (valid) {
       if (!valid) return
-      runButton.remove('hidden')
+      ui.$runButton.removeClass('hidden')
       $('.editor-picker').removeClass('hidden')
       packageTags.html('')
-      var modules = detective(bundleEditor.editor.getValue())
+      var modules = detective(editors.get('bundle').getValue())
       modules.map(function (module) {
         var tag =
         '<span class="tag"><a target="_blank" href="http://npmjs.org/' +
@@ -299,12 +261,6 @@ function initialize () {
       }
     })
 
-    $('.run-btn').click(function (e) {
-      e.preventDefault()
-      $('a[data-action="play"]').click()
-      return false
-    })
-
     $('.actionsButtons a').click(function () {
       var target = $(this)
       var action = target.attr('data-action')
@@ -312,34 +268,30 @@ function initialize () {
     })
 
     var actions = {
-      play: function (pressed) {
-        runButton.add('disabled')
-
-        var code = bundleEditor.editor.getValue()
-        if (codeMD5 && codeMD5 === md5(code)) {
-          loadingClass.add('hidden')
-          sandbox.iframe.setHTML('<script type="text/javascript" src="embed-bundle.js"></script>')
+      play: function () {
+        // only execute play if any editor is dirty
+        var isDirty = editors.asArray()
+          .filter(function (editor) {
+            return !editor.editor.isClean()
+          })
+          .length > 0
+        if (!isDirty) {
+          return
         }
-        doBundle()
 
-        bundleEditor.once('change', function (e) {
-          runButton.remove('disabled')
+        // mark all the editors as clean
+        editors.all(function (editor) {
+          editor.editor.markClean()
         })
-      },
 
-      edit: function () {
-        elementClass(howTo).remove('hidden')
-        if (!editorEl.className.match(/hidden/)) return
-        elementClass(editorEl).remove('hidden')
-        elementClass(outputEl).add('hidden')
-        var message = document.querySelector('.alert')
-        if (message) message.classList.add('hidden')
-        if (sandbox.iframe) sandbox.iframe.setHTML(' ')
+        ui.$runButton.addClass('disabled')
+        ui.$spinner.hide()
+        doBundle()
       },
 
       save: function () {
         if (loggedIn) return saveGist(gistID)
-        loadingClass.remove('hidden')
+        ui.$spinner.show()
         var loginURL = 'https://github.com/login/oauth/authorize' +
           '?client_id=' + config.GITHUB_CLIENT +
           '&scope=gist' +
@@ -349,7 +301,7 @@ function initialize () {
 
       'save-private': function () {
         if (loggedIn) return saveGist(gistID, { 'isPublic': false })
-        loadingClass.remove('hidden')
+        ui.$spinner.show()
 
         var loginURL = 'https://github.com/login/oauth/authorize' +
           '?client_id=' + config.GITHUB_CLIENT +
@@ -371,52 +323,25 @@ function initialize () {
       }
     }
 
-    // changes the active editor
-    var $editors = $('.require-bin-editor')
-    var $editorLinks = $('.editor-picker a')
-    $editorLinks.click(function () {
-      var self = $(this)
-      var editor
-      // there's only one primary button
-      var editorName = self.attr('data-editor')
-      $editorLinks.removeClass('btn-primary')
-      self.addClass('btn-primary')
-      // hide all editors and show the active editor
-      $editors.addClass('hidden')
-      $('#edit-' + editorName).removeClass('hidden')
-      activeEditor = editors[editorName]
-      activeEditor.emit('afterFocus')
-      editor = activeEditor.editor
-      editor.refresh()
-    })
-
     sandbox.on('bundleStart', function () {
-      loadingClass.remove('hidden')
+      ui.$spinner.show()
     })
 
     sandbox.on('bundleEnd', function (bundle) {
-      loadingClass.add('hidden')
+      ui.$spinner.hide()
     })
 
     sandbox.on('bundleError', function (err) {
-      loadingClass.add('hidden')
-      tooltipMessage('error', 'Bundling error: \n\n' + err)
+      ui.$spinner.hide()
+      ui.tooltipMessage('error', 'Bundling error: \n\n' + err)
     })
 
     if (!gistID) {
-      [bundleEditor, headEditor, bodyEditor].forEach(function (editor) {
+      editors.all(function (editor) {
         editor.on('change', function () {
           var code = editor.editor.getValue()
-          // e.g. bundleCode, headCode, bodyCode
           localStorage.setItem(editor.name + 'Code', code)
         })
-      })
-
-      metaEditor.on('change', function () {
-        var code = metaEditor.editor.getValue()
-        try {
-          window.packagejson = packagejson = JSON.parse(code)
-        } catch (e) { }
       })
     }
 
@@ -429,54 +354,4 @@ function initialize () {
     }, 500)
 
   })
-}
-
-/*
-  display error/warning messages in the site header
-  cssClass should be a default bootstrap class
-  .warning .alert .info .success
-  text is the message content
-*/
-function tooltipMessage (cssClass, text) {
-  var message = document.querySelector('.alert')
-  if (message) {
-    message.classList.remove('hidden')
-    message.classList.add('alert-' + cssClass)
-    message.innerHTML = text
-  } else {
-    message = document.createElement('div')
-    message.classList.add('alert')
-    var close = document.createElement('span')
-    close.classList.add('pull-right')
-    close.innerHTML = '&times'
-    close.addEventListener('click', function () {
-      this.parentNode.classList.add('hidden')
-    }, false)
-    message.classList.add('alert-' + cssClass)
-    message.innerHTML = text
-    document.querySelector('body').appendChild(message)
-    message.appendChild(close)
-  }
-}
-
-function getGistID (parsedURL) {
-  var gistID
-  if (parsedURL.query.gist) {
-    gistID = parsedURL.query.gist
-  } else if (parsedURL.hash) {
-    gistID = parsedURL.hash.replace('#', '')
-  }
-  if (!gistID) return
-  if (gistID.indexOf('/') > -1) {
-    var parts = gistID.split('/')
-    gistID = {
-      user: parts[0],
-      id: parts[1]
-    }
-  } else {
-    gistID = {
-      id: gistID
-    }
-  }
-  return gistID
 }
