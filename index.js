@@ -127,49 +127,9 @@ function initialize () {
     })
   }
 
-  function loadCode (cb) {
-    var code = {}
-
-    function invokeCallback () {
-      cb(false, code)
-    }
-
-    if (gistID) {
-      ui.$spinner.show()
-      return githubGist.load(gistID, function (err, gist) {
-        ui.$spinner.hide()
-        if (err) return cb(err)
-        var json = gist.data
-        if (!json.files || !json.files['index.js']) return cb({error: 'no index.js in this gist', json: json})
-        var headHtml = json.files['page-head.html'] || {content: ''}
-        var bodyHtml = json.files['page-body.html'] || {content: ''}
-        var pkgJson = json.files['package.json'] || {content: ''}
-        code.head = headHtml.content
-        code.body = bodyHtml.content
-        code.meta = pkgJson.content
-        code.bundle = json.files['index.js'].content
-        var pj = json.files['package.json']
-        if (pj) {
-          try {
-            pj = JSON.parse(pj.content)
-          } catch (e) {
-            pj = false
-          }
-          if (pj) packagejson.dependencies = pj.dependencies
-        }
-        invokeCallback()
-      })
-    }
-
-    code.bundle = localStorage.getItem('bundleCode') ||
-      document.querySelector('#bundle-template').innerText
-    code.head = localStorage.getItem('headCode') || ''
-    code.body = localStorage.getItem('bodyCode') || ''
-    code.meta = localStorage.getItem('metaCode') || ''
-    invokeCallback()
-  }
-
-  loadCode(function (err, code) {
+  ui.$spinner.show()
+  githubGist.getRelevantCodeFromGist(gistID, function (err, code) {
+    ui.$spinner.hide()
     if (err) return ui.tooltipMessage('error', JSON.stringify(err))
 
     editors.init(code)
@@ -178,21 +138,26 @@ function initialize () {
     // actions done with the meta editor:
     // - update the value of the editor whenever it's focused (it always has a valid json)
     // - the runButton is disabled if the value it has is invalid
+    function updatePackageJson() {
+      var code = editors.get('meta').editor.getValue()
+      try {
+        ui.$runButton.removeClass('disabled')
+        window.packagejson = packagejson = JSON.parse(code)
+      } catch (e) {
+        // don't allow running the code if package.json is invalid
+        ui.$runButton.addClass('disabled')
+      }
+    }
+
     editors.get('meta')
       .on('afterFocus', function (editor) {
         editor.setValue(stringifyPackageJson())
       })
     editors.get('meta')
-      .on('change', function () {
-        var code = editors.get('meta').editor.getValue()
-        try {
-          ui.$runButton.removeClass('disabled')
-          window.packagejson = packagejson = JSON.parse(code)
-        } catch (e) {
-          // don't allow running the code if package.json is invalid
-          ui.$runButton.addClass('disabled')
-        }
-      })
+      .on('change', updatePackageJson)
+
+    // perform an initial package.json check
+    updatePackageJson()
 
     var sandboxOpts = {
       cdn: config.BROWSERIFYCDN,
@@ -320,6 +285,10 @@ function initialize () {
       share: function () {
         elementClass(howTo).add('hidden')
         elementClass(share).remove('hidden')
+      },
+
+      'show-forks': function () {
+        gistID && ui.showForks(githubGist.forks, githubGist.parent)
       }
     }
 

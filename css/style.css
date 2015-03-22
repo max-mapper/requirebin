@@ -264,3 +264,17 @@ body > pre { display: none }
     display: none;
   }
 }
+
+/* shameless copy from http://dimsemenov.com/plugins/magnific-popup/documentation.html#image-type */
+.white-popup {
+  position: relative;
+  background: #FFF;
+  padding: 20px;
+  width: auto;
+  max-width: 500px;
+  margin: 20px auto;
+}
+.white-popup pre {
+  display: inline-block;
+  margin: 5px 10px
+}
