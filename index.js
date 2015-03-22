@@ -18,23 +18,28 @@ var editors = window.editors = require('./lib/editors')
 initialize()
 
 function initialize () {
+  var sandbox
+  var gistID
+
   var githubGist = new Gist({
     token: cookie.get('oauth-token'),
     auth: 'oauth'
   })
-
-  var sandbox
   var packagejson = {'name': 'requirebin-sketch', 'version': '1.0.0'}
+  var parsedURL = url.parse(window.location.href, true)
+  var gistTokens = Gist.fromUrl(parsedURL)
   window.packagejson = packagejson
+
+  // dom nodes
+  var outputEl = document.querySelector('#play')
+  var howTo = document.querySelector('#howto')
+  var share = document.querySelector('#share')
 
   var loggedIn = false
   if (cookie.get('oauth-token')) loggedIn = true
 
-  var parsedURL = url.parse(window.location.href, true)
-
-  var gistID = getGistID(parsedURL)
-  if (gistID) {
-    gistID = gistID.id
+  if (gistTokens) {
+    gistID = gistTokens.id
     ui.enableShare(gistID)
   }
 
@@ -45,13 +50,6 @@ function initialize () {
   var currentHost = parsedURL.protocol + '//' + parsedURL.hostname
   if (parsedURL.port) currentHost += ':' + parsedURL.port
 
-  var runButton = elementClass(document.querySelector('.play-button'))
-  var outputEl = document.querySelector('#play')
-  var editorHeadEl = document.querySelector('#edit-head')
-  var editorBodyEl = document.querySelector('#edit-body')
-  var editorMetaEl = document.querySelector('#edit-meta')
-  var editorEl = document.querySelector('#edit-bundle')
-
   function doBundle () {
     sandbox.iframeHead = editors.get('head').getValue()
     sandbox.iframeBody = editors.get('body').getValue()
@@ -61,7 +59,6 @@ function initialize () {
   // todo: move to auth.js
   function authenticate () {
     if (cookie.get('oauth-token')) {
-      loggedIn = true
       return
     }
     var match = window.location.href.match(/\?code=([a-z0-9]*)/)
@@ -73,7 +70,6 @@ function initialize () {
       console.log('auth response', resp, data)
       if (data.token === 'undefined') return console.error('Auth failed to acquire token')
       cookie.set('oauth-token', data.token)
-      loggedIn = true
       // Adjust URL
       var regex = new RegExp('\\?code=' + match[1])
       window.location.href = window.location.href.replace(regex, '').replace('&state=', '') + '?save=true'
@@ -125,7 +121,7 @@ function initialize () {
           newGistId = newGist.user.login + '/' + newGistId
         }
         ui.$spinner.hide()
-        if (err) tooltipMessage('error', err.toString())
+        if (err) ui.tooltipMessage('error', err.toString())
         if (newGistId) window.location.href = '/?gist=' + newGistId
       })
     })
@@ -174,10 +170,29 @@ function initialize () {
   }
 
   loadCode(function (err, code) {
-    if (err) return tooltipMessage('error', JSON.stringify(err))
+    if (err) return ui.tooltipMessage('error', JSON.stringify(err))
 
-    editors.init(code);
+    editors.init(code)
     editors.setActive('bundle')
+
+    // actions done with the meta editor:
+    // - update the value of the editor whenever it's focused (it always has a valid json)
+    // - the runButton is disabled if the value it has is invalid
+    editors.get('meta')
+      .on('afterFocus', function (editor) {
+        editor.setValue(stringifyPackageJson())
+      })
+    editors.get('meta')
+      .on('change', function () {
+        var code = editors.get('meta').editor.getValue()
+        try {
+          ui.$runButton.removeClass('disabled')
+          window.packagejson = packagejson = JSON.parse(code)
+        } catch (e) {
+          // don't allow running the code if package.json is invalid
+          ui.$runButton.addClass('disabled')
+        }
+      })
 
     var sandboxOpts = {
       cdn: config.BROWSERIFYCDN,
@@ -206,9 +221,6 @@ function initialize () {
     })
 
     if (parsedURL.query.save) return
-
-    var howTo = document.querySelector('#howto')
-    var share = document.querySelector('#share')
 
     document.querySelector('.hide-howto').addEventListener('click', function () {
       elementClass(howTo).add('hidden')
@@ -249,12 +261,6 @@ function initialize () {
       }
     })
 
-    $('.run-btn').click(function (e) {
-      e.preventDefault()
-      $('a[data-action="play"]').click()
-      return false
-    })
-
     $('.actionsButtons a').click(function () {
       var target = $(this)
       var action = target.attr('data-action')
@@ -262,15 +268,15 @@ function initialize () {
     })
 
     var actions = {
-      play: function (pressed) {
+      play: function () {
         // only execute play if any editor is dirty
         var isDirty = editors.asArray()
           .filter(function (editor) {
             return !editor.editor.isClean()
           })
-          .length > 0;
+          .length > 0
         if (!isDirty) {
-          return;
+          return
         }
 
         // mark all the editors as clean
@@ -281,16 +287,6 @@ function initialize () {
         ui.$runButton.addClass('disabled')
         ui.$spinner.hide()
         doBundle()
-      },
-
-      edit: function () {
-        elementClass(howTo).remove('hidden')
-        if (!editorEl.className.match(/hidden/)) return
-        elementClass(editorEl).remove('hidden')
-        elementClass(outputEl).add('hidden')
-        var message = document.querySelector('.alert')
-        if (message) message.classList.add('hidden')
-        if (sandbox.iframe) sandbox.iframe.setHTML(' ')
       },
 
       save: function () {
@@ -337,24 +333,16 @@ function initialize () {
 
     sandbox.on('bundleError', function (err) {
       ui.$spinner.hide()
-      tooltipMessage('error', 'Bundling error: \n\n' + err)
+      ui.tooltipMessage('error', 'Bundling error: \n\n' + err)
     })
 
     if (!gistID) {
       editors.all(function (editor) {
-        editor.on('change', function (instance) {
-          var code = instance.getValue()
+        editor.on('change', function () {
+          var code = editor.editor.getValue()
           localStorage.setItem(editor.name + 'Code', code)
         })
       })
-
-      editors.get('meta')
-        .on('change', function (instance) {
-          var code = instance.getValue()
-          try {
-            window.packagejson = packagejson = JSON.parse(code)
-          } catch (e) { }
-        })
     }
 
     keydown(['<meta>', '<enter>']).on('pressed', actions.play)
@@ -366,54 +354,4 @@ function initialize () {
     }, 500)
 
   })
-}
-
-/*
-  display error/warning messages in the site header
-  cssClass should be a default bootstrap class
-  .warning .alert .info .success
-  text is the message content
-*/
-function tooltipMessage (cssClass, text) {
-  var message = document.querySelector('.alert')
-  if (message) {
-    message.classList.remove('hidden')
-    message.classList.add('alert-' + cssClass)
-    message.innerHTML = text
-  } else {
-    message = document.createElement('div')
-    message.classList.add('alert')
-    var close = document.createElement('span')
-    close.classList.add('pull-right')
-    close.innerHTML = '&times'
-    close.addEventListener('click', function () {
-      this.parentNode.classList.add('hidden')
-    }, false)
-    message.classList.add('alert-' + cssClass)
-    message.innerHTML = text
-    document.querySelector('body').appendChild(message)
-    message.appendChild(close)
-  }
-}
-
-function getGistID (parsedURL) {
-  var gistID
-  if (parsedURL.query.gist) {
-    gistID = parsedURL.query.gist
-  } else if (parsedURL.hash) {
-    gistID = parsedURL.hash.replace('#', '')
-  }
-  if (!gistID) return
-  if (gistID.indexOf('/') > -1) {
-    var parts = gistID.split('/')
-    gistID = {
-      user: parts[0],
-      id: parts[1]
-    }
-  } else {
-    gistID = {
-      id: gistID
-    }
-  }
-  return gistID
 }
