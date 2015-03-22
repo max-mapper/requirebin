@@ -13,4 +13,4 @@ var envs = {
   }
 }
 
-module.exports = envs.dev
+module.exports = envs.production
