@@ -138,7 +138,7 @@ function initialize () {
     // actions done with the meta editor:
     // - update the value of the editor whenever it's focused (it always has a valid json)
     // - the runButton is disabled if the value it has is invalid
-    function updatePackageJson() {
+    function updatePackageJson () {
       var code = editors.get('meta').editor.getValue()
       try {
         ui.$runButton.removeClass('disabled')
