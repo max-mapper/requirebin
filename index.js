@@ -193,7 +193,7 @@ function initialize () {
       })
 
       // hide the forks option in the dropdown
-      $('a[data-dk-dropdown-value="show-forks"]').parent('li').hide();
+      $('a[data-dk-dropdown-value="show-forks"]').parent('li').hide()
     }
 
     var sandboxOpts = {
