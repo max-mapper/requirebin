@@ -162,7 +162,7 @@ function initialize () {
     }
 
     code.bundle = localStorage.getItem('bundleCode') ||
-      document.querySelector('#bundle-template').innerText
+      document.querySelector('#bundle-template').innerHTML
     code.head = localStorage.getItem('headCode') || ''
     code.body = localStorage.getItem('bodyCode') || ''
     code.meta = localStorage.getItem('metaCode') || ''
