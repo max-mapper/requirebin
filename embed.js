@@ -45,5 +45,7 @@ function render (head, body, bundle) {
   if (!bundle) bundle = "document.body.innerHTML += 'not a valid requirebin gist - missing minified.js'"
 
   var _eval = eval
-  _eval(bundle)
+  setTimeout(function () {
+    _eval(bundle)
+  }, 0)
 }
