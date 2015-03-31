@@ -16,23 +16,31 @@ function loadFromAPI (gistID) {
   jsonp('https://api.github.com/gists/' + gistID, function (err, gist) {
     if (err) return console.log(err)
 
-    getGistFiles(gist, ['page-head.html', 'head.html', 'minified.js'], function (err) {
+    getGistFiles(gist, ['page-head.html', 'page-body.html', 'head.html', 'minified.js'], function (err) {
       if (err) return console.log(err)
       var files = gist.data.files
+      var head
+      var body
+      var bundle
 
-      var headFile = files['page-head.html']
-      if (!headFile) headFile = files['head.html']
-      if (headFile) var head = headFile.content
-
-      var minFile = files['minified.js']
-      if (minFile) var bundle = minFile.content
-      render(head, bundle)
+      var headFile = files['page-head.html'] || files['head.html']
+      if (headFile) {
+        head = headFile.content
+      }
+      if (files['page-body.html']) {
+        body = files['page-body.html'].content
+      }
+      if (files['minified.js']) {
+        bundle = files['minified.js'].content
+      }
+      render(head, body, bundle)
     })
   })
 }
 
-function render (head, bundle) {
+function render (head, body, bundle) {
   if (head) document.head.innerHTML += head
+  if (body) document.body.innerHTML += body
 
   if (!bundle) bundle = "document.body.innerHTML += 'not a valid requirebin gist - missing minified.js'"
 
