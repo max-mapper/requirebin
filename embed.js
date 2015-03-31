@@ -1,7 +1,7 @@
 var jsonp = require('jsonp')
 var url = require('url')
 var getGistFiles = require('./get-gist-files')
-
+var $ = window.jQuery
 var parsedURL = url.parse(window.location.href, true)
 var gistID = parsedURL.query.gist
 
@@ -40,12 +40,17 @@ function loadFromAPI (gistID) {
 
 function render (head, body, bundle) {
   if (head) document.head.innerHTML += head
-  if (body) document.body.innerHTML += body
+  if (body) {
+    $(document.body).append($.parseHTML(body, document, true))
+  }
 
-  if (!bundle) bundle = "document.body.innerHTML += 'not a valid requirebin gist - missing minified.js'"
-
-  var _eval = eval
-  setTimeout(function () {
-    _eval(bundle)
-  }, 0)
+  if (!bundle) {
+    document.body.innerHTML += 'not a valid requirebin gist - missing minified.js'
+  } else {
+    $(document.body).append(
+      $('<script />')
+        .attr('type', 'text/javascript')
+        .text('setTimeout(function () {' + bundle + '}, 1000)')
+    )
+  }
 }
