@@ -26,14 +26,20 @@ function updateUIBeforeGistLoad () {
   document.getElementById('requirebin-link').href = 'http://requirebin.com/' + binURL
 
   // disable some tabs
-  var tabs = (typeof parsedURL.query.tabs !== 'undefined'
-    ? parsedURL.query.tabs
-    : 'code,head,body,meta').split(',')
-  // result is always visible
-  $('#result-link').addClass('visible')
+  var tabs = (parsedURL.query.tabs || '')
+    .split(',')
+    .filter(function (tok) { return !!tok })
+  if (tabs.length) {
+    $('#result-link').addClass('visible')
+  }
   tabs.forEach(function (tab) {
     $('#' + tab + '-link').addClass('visible')
   })
+
+  // if no tab is enabled then plain mode is activated
+  if (!tabs.length) {
+    $(document.body).addClass('plain')
+  }
 }
 
 function loadFromAPI (gistID) {
@@ -70,6 +76,11 @@ function loadFromAPI (gistID) {
 function render (content) {
   if (!content.bundle || !content.meta) {
     content.bundle = 'document.write("not a valid requirebin gist - missing minified.js")'
+  }
+
+  // disable default styling on the iframe
+  if (content.head) {
+    content.head = '<style> html, body{ margin: 0; padding: 0; border: 0; }</style>' + content.head;
   }
 
   iframe({

@@ -14,6 +14,7 @@ iframe {
 }
 body {
   font: 300 12px "Helvetica Neue", Helvetica, Arial;
+  overflow: hidden;
 }
 pre {
   padding: 10px;
@@ -28,6 +29,7 @@ code {
 
 /* top bar */
 #nav {
+  z-index: 1;
   padding: 10px;
   height: 30px;
   border-bottom: 1px solid #eee;
@@ -53,13 +55,22 @@ code {
 }
 
 /* editors */
+#output {
+  position: absolute;
+  top: 50px;
+  overflow: auto;
+}
 #output > div {
   display: none;
 }
 #output > div.active {
   display: block;
 }
-#output {
-  position: absolute;
-  top: 50px;
+
+/* plain mode */
+body.plain #output {
+  top: 0;
+}
+body.plain #nav {
+  display: none;
 }
