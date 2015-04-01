@@ -127,49 +127,9 @@ function initialize () {
     })
   }
 
-  function loadCode (cb) {
-    var code = {}
-
-    function invokeCallback () {
-      cb(false, code)
-    }
-
-    if (gistID) {
-      ui.$spinner.show()
-      return githubGist.load(gistID, function (err, gist) {
-        ui.$spinner.hide()
-        if (err) return cb(err)
-        var json = gist.data
-        if (!json.files || !json.files['index.js']) return cb({error: 'no index.js in this gist', json: json})
-        var headHtml = json.files['page-head.html'] || {content: ''}
-        var bodyHtml = json.files['page-body.html'] || {content: ''}
-        var pkgJson = json.files['package.json'] || {content: ''}
-        code.head = headHtml.content
-        code.body = bodyHtml.content
-        code.meta = pkgJson.content
-        code.bundle = json.files['index.js'].content
-        var pj = json.files['package.json']
-        if (pj) {
-          try {
-            pj = JSON.parse(pj.content)
-          } catch (e) {
-            pj = false
-          }
-          if (pj) packagejson.dependencies = pj.dependencies
-        }
-        invokeCallback()
-      })
-    }
-
-    code.bundle = localStorage.getItem('bundleCode') ||
-      document.querySelector('#bundle-template').innerHTML
-    code.head = localStorage.getItem('headCode') || ''
-    code.body = localStorage.getItem('bodyCode') || ''
-    code.meta = localStorage.getItem('metaCode') || ''
-    invokeCallback()
-  }
-
-  loadCode(function (err, code) {
+  ui.$spinner.show()
+  githubGist.getCodeFromGist(gistID, function (err, code) {
+    ui.$spinner.hide()
     if (err) return ui.tooltipMessage('error', JSON.stringify(err))
 
     editors.init(code)
@@ -178,21 +138,49 @@ function initialize () {
     // actions done with the meta editor:
     // - update the value of the editor whenever it's focused (it always has a valid json)
     // - the runButton is disabled if the value it has is invalid
+    function updatePackageJson () {
+      var code = editors.get('meta').editor.getValue()
+      try {
+        ui.$runButton.removeClass('disabled')
+        window.packagejson = packagejson = JSON.parse(code)
+      } catch (e) {
+        // don't allow running the code if package.json is invalid
+        ui.$runButton.addClass('disabled')
+      }
+    }
+
+    // perform an initial package.json check
+    updatePackageJson()
+
     editors.get('meta')
       .on('afterFocus', function (editor) {
         editor.setValue(stringifyPackageJson())
       })
     editors.get('meta')
-      .on('change', function () {
-        var code = editors.get('meta').editor.getValue()
-        try {
-          ui.$runButton.removeClass('disabled')
-          window.packagejson = packagejson = JSON.parse(code)
-        } catch (e) {
-          // don't allow running the code if package.json is invalid
-          ui.$runButton.addClass('disabled')
-        }
+      .on('change', updatePackageJson)
+
+    // remove the `disabled` class from the save button when any editor is updated
+    editors.all(function (editor) {
+      editor.once('change', function (e) {
+        ui.$runButton.removeClass('disabled')
       })
+    })
+
+    var packageTags = $('.tagsinput')
+    editors.get('bundle').on('valid', function (valid) {
+      if (!valid) return
+      ui.$runButton.removeClass('hidden')
+      $('.editor-picker').removeClass('hidden')
+      packageTags.html('')
+      var modules = detective(editors.get('bundle').getValue())
+      modules.map(function (module) {
+        var tag =
+          '<span class="tag"><a target="_blank" href="http://npmjs.org/' +
+          module + '"><span>' + module + '&nbsp&nbsp</span></a></span>'
+        packageTags.append(tag)
+      })
+      if (modules.length === 0) packageTags.append('<div class="tagsinput-add">No Modules Required Yet</div>')
+    })
 
     var sandboxOpts = {
       cdn: config.BROWSERIFYCDN,
@@ -211,6 +199,7 @@ function initialize () {
       sandbox = createSandbox(sandboxOpts)
     }
 
+    // sandbox actions
     sandbox.on('modules', function (modules) {
       if (!modules) return
       packagejson.dependencies = {}
@@ -220,34 +209,26 @@ function initialize () {
       })
     })
 
+    sandbox.on('bundleStart', function () {
+      ui.$spinner.show()
+    })
+
+    sandbox.on('bundleEnd', function (bundle) {
+      ui.$spinner.hide()
+    })
+
+    sandbox.on('bundleError', function (err) {
+      ui.$spinner.hide()
+      ui.tooltipMessage('error', 'Bundling error: \n\n' + err)
+    })
+
     if (parsedURL.query.save) return
+
+    // UI actions
+    // TODO: move them to ui-controller.js
 
     document.querySelector('.hide-howto').addEventListener('click', function () {
       elementClass(howTo).add('hidden')
-    })
-
-    var packageTags = $('.tagsinput')
-
-    // remove the `disabled` class from the save button when any editor is updated
-    editors.all(function (editor) {
-      editor.once('change', function (e) {
-        ui.$runButton.removeClass('disabled')
-      })
-    })
-
-    editors.get('bundle').on('valid', function (valid) {
-      if (!valid) return
-      ui.$runButton.removeClass('hidden')
-      $('.editor-picker').removeClass('hidden')
-      packageTags.html('')
-      var modules = detective(editors.get('bundle').getValue())
-      modules.map(function (module) {
-        var tag =
-        '<span class="tag"><a target="_blank" href="http://npmjs.org/' +
-            module + '"><span>' + module + '&nbsp&nbsp</span></a></span>'
-        packageTags.append(tag)
-      })
-      if (modules.length === 0) packageTags.append('<div class="tagsinput-add">No Modules Required Yet</div>')
     })
 
     var actionsMenu = $('.actionsMenu')
@@ -265,6 +246,13 @@ function initialize () {
       var target = $(this)
       var action = target.attr('data-action')
       if (action in actions) actions[action]()
+    })
+
+    // call actions.play from the button located in the instructions
+    $('.run-btn').click(function (e) {
+      e.preventDefault()
+      $('a[data-action="play"]').click()
+      return false
     })
 
     var actions = {
@@ -320,33 +308,29 @@ function initialize () {
       share: function () {
         elementClass(howTo).add('hidden')
         elementClass(share).remove('hidden')
+      },
+
+      'show-forks': function () {
+        gistID && ui.showForks(githubGist.forks, githubGist.parent)
       }
     }
 
-    sandbox.on('bundleStart', function () {
-      ui.$spinner.show()
-    })
+    keydown(['<meta>', '<enter>']).on('pressed', actions.play)
+    keydown(['<control>', '<enter>']).on('pressed', actions.play)
 
-    sandbox.on('bundleEnd', function (bundle) {
-      ui.$spinner.hide()
-    })
-
-    sandbox.on('bundleError', function (err) {
-      ui.$spinner.hide()
-      ui.tooltipMessage('error', 'Bundling error: \n\n' + err)
-    })
-
+    // UI actions when there's no Gist
     if (!gistID) {
+      // enable localStorage save when the user is working on a new gist
       editors.all(function (editor) {
         editor.on('change', function () {
           var code = editor.editor.getValue()
           localStorage.setItem(editor.name + 'Code', code)
         })
       })
-    }
 
-    keydown(['<meta>', '<enter>']).on('pressed', actions.play)
-    keydown(['<control>', '<enter>']).on('pressed', actions.play)
+      // hide the forks option in the dropdown
+      $('a[data-dk-dropdown-value="show-forks"]').parent('li').hide()
+    }
 
     // loads the current code on load
     setTimeout(function () {
