@@ -10,7 +10,7 @@ var gistID = parsedURL.query.gist
 var $codeEls = $('#output > div')
 var $links = $('#links a')
 
-var binURL = '/?gist=' + gistID
+var binURL = '?gist=' + gistID
 
 if (gistID.indexOf('/') > -1) gistID = gistID.split('/')[1]
 
