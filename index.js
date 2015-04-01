@@ -84,7 +84,7 @@ function initialize () {
 
   function saveGist (id, opts) {
     ui.$spinner.show()
-    var entry = editors.bundle.editor.getValue()
+    var entry = editors.get('bundle').getValue()
     opts = opts || {}
     opts.isPublic = 'isPublic' in opts ? opts.isPublic : true
 
