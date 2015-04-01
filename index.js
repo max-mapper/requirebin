@@ -128,7 +128,7 @@ function initialize () {
   }
 
   ui.$spinner.show()
-  githubGist.getRelevantCodeFromGist(gistID, function (err, code) {
+  githubGist.getCodeFromGist(gistID, function (err, code) {
     ui.$spinner.hide()
     if (err) return ui.tooltipMessage('error', JSON.stringify(err))
 
@@ -181,20 +181,6 @@ function initialize () {
       })
       if (modules.length === 0) packageTags.append('<div class="tagsinput-add">No Modules Required Yet</div>')
     })
-
-    // UI actions when there's no Gist
-    if (!gistID) {
-      // enable localStorage save when the user is working on a new gist
-      editors.all(function (editor) {
-        editor.on('change', function () {
-          var code = editor.editor.getValue()
-          localStorage.setItem(editor.name + 'Code', code)
-        })
-      })
-
-      // hide the forks option in the dropdown
-      $('a[data-dk-dropdown-value="show-forks"]').parent('li').hide()
-    }
 
     var sandboxOpts = {
       cdn: config.BROWSERIFYCDN,
@@ -331,6 +317,20 @@ function initialize () {
 
     keydown(['<meta>', '<enter>']).on('pressed', actions.play)
     keydown(['<control>', '<enter>']).on('pressed', actions.play)
+
+    // UI actions when there's no Gist
+    if (!gistID) {
+      // enable localStorage save when the user is working on a new gist
+      editors.all(function (editor) {
+        editor.on('change', function () {
+          var code = editor.editor.getValue()
+          localStorage.setItem(editor.name + 'Code', code)
+        })
+      })
+
+      // hide the forks option in the dropdown
+      $('a[data-dk-dropdown-value="show-forks"]').parent('li').hide()
+    }
 
     // loads the current code on load
     setTimeout(function () {
