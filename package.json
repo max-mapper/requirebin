@@ -4,7 +4,7 @@
   "description": "create programs in the browser using modules from NPM",
   "scripts": {
     "start": "beefy embed.js:embed-bundle.js index.js:bundle.js -p 5000",
-    "build": "browserify embed.js -o embed-bundle.js && browserify index.js -o bundle.js --debug",
+    "build": "browserify embed.js -o embed-bundle.js && browserify embed2.js -o embed-bundle-v2.js && browserify index.js -o bundle.js --debug",
     "minify": "cat bundle.js | uglifyjs -o bundle.js",
     "modifyconfig": "sed -i '.bak' 's/envs.dev/envs.production/' config.js && rm config.js.bak",
     "deploy": "standard && gh-pages-deploy",
@@ -39,6 +39,7 @@
     "element-class": "0.0.2",
     "github-api": "0.7.0",
     "github-oauth": "0.0.4",
+    "iframe": "^0.3.1",
     "javascript-editor": "~0.2.1",
     "jsonp": "0.0.3",
     "keydown": "~0.0.3",

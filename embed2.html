@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css"/>
+    <link rel="stylesheet" href="css/bootstrap.css"/>
+    <link rel="stylesheet" href="flatui/css/flat-ui.css"/>
+    <link rel="stylesheet" href="css/embed.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/vs.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="nav" class="stretch">
+      <div id="links" class="btn-group">
+        <a class="btn btn-primary" id="result-link" href="#result">result</a>
+        <a class="btn" id="code-link" href="#code">code</a>
+        <a class="btn" id="head-link" href="#head">&lt;head&gt;</a>
+        <a class="btn" id="body-link" href="#body">&lt;body&gt;</a>
+        <a class="btn" id="meta-link" href="#meta">package.json</a>
+      </div>
+
+      <div class="logo">
+        <a class="requirebin-link" href="/" target="_blank">
+          Edit on <img src="img/logo-black.png">
+        </a>
+      </div>
+    </div>
+
+    <a class="requirebin-link" target="_blank">
+      <img id="requirebin-badge" src="badge.png" alt="edit on requirebin"/>
+    </a>
+
+    <div id="output" class="stretch">
+      <div id="result" class="active"></div>
+      <div id="code">
+        <pre><code class="js"></code></pre>
+      </div>
+      <div id="head">
+        <pre><code class="html"></code></pre>
+      </div>
+      <div id="body">
+        <pre><code class="html"></code></pre>
+      </div>
+      <div id="meta">
+        <pre><code class="json"></code></pre>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script type='text/javascript' src="embed-bundle-v2.js"></script>
+  </body>
+</html>
