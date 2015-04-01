@@ -147,10 +147,8 @@ body > pre { display: none }
 .require-bin-editor .CodeMirror .errorLine { background: rgba(255,0,0,0.25); }
 
 #play { overflow: hidden }
-#shareTextarea { font-size: 12px; }
-#shareInstructions p { margin: 5px 0; }
 
-#howto, #share, .packagejson { padding: 20px; position: absolute; right: 0; background: white; width: 40%; overflow: auto; border-left: 1px solid #eee; border-bottom: 1px solid #eee; }
+#howto, .packagejson { padding: 20px; position: absolute; right: 0; background: white; width: 40%; overflow: auto; border-left: 1px solid #eee; border-bottom: 1px solid #eee; }
 .packagejson { clear: both; }
 .packagejson .tagsinput .tag:hover { padding: 6px 13px 6px 19px; }
 .packagejson h6 { margin-top: 0; }
@@ -266,15 +264,32 @@ body > pre { display: none }
 }
 
 /* shameless copy from http://dimsemenov.com/plugins/magnific-popup/documentation.html#image-type */
-.white-popup {
+.mfp-content > div {
   position: relative;
   background: #FFF;
   padding: 20px;
   width: auto;
-  max-width: 500px;
+  max-width: 700px;
   margin: 20px auto;
 }
-.white-popup pre {
+.mfp-content pre {
   display: inline-block;
   margin: 5px 10px
+}
+
+
+/* share */
+#share textarea {
+  font-size: 12px;
+  width: 90%;
+}
+#shareTextarea { font-size: 12px; }
+#shareInstructions p { margin: 5px 0; }
+
+#share-options label{
+  display: inline-block;
+  margin: 0 5px;
+}
+#share-options input[type="checkbox"] {
+  margin: 0 4px;
 }

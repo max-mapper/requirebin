@@ -48,11 +48,24 @@
 		</div>
 
     <div id="play" class="right">
-      <div id="share" class="hidden">
+
+      <!--mfp-hide is used on the popup-->
+      <div id="share" class="mfp-hide">
+        <h3>Share</h3>
         <p id="shareDisabled">You have to save your project before you can embed it.</p>
-        <div id="shareInstructions" class="hidden">
+        <div id="shareInstructions">
           <p>HTML Embed code:</p>
           <textarea id="shareTextarea"></textarea>
+
+          <form id="share-options">
+            <label><input type="checkbox" name="code" value="false"/>code</label>
+            <label><input type="checkbox" name="head" value="false"/>head</label>
+            <label><input type="checkbox" name="body" value="false"/>body</label>
+            <label><input type="checkbox" name="meta" value="false"/>package.json</label>
+          </form>
+
+          <iframe id="share-iframe-example" src="" frameborder="0" style="width: 100%; height: 450px"></iframe>
+
           <p>HTML Embed example:</p>
           <p><a href="/embed?gist=6264704" target="_blank">requirebin.com/embed?gist=6264704</a></p>
           <p>Share Badge Markdown code:</p>
@@ -63,6 +76,7 @@
           <a class="requirebin-link" target="_blank"><div class="requirebin-badge"></div></a>
         </div>
       </div>
+
       <div id="howto" class="hidden">
         <p>Node.js style modular code gets transformed into code that can run client-side using <a href="http://browserify.org/" target="_blank">browserify</a> via <a target="_blank" href="http://wzrd.in.nyud.net/" target="_blank">browserify-cdn</a>.</p>
                 

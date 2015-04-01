@@ -40,7 +40,6 @@ function initialize () {
 
   if (gistTokens) {
     gistID = gistTokens.id
-    ui.enableShare(gistID)
   }
 
   // special parameter `code` is used to perform the auth + redirection
@@ -225,7 +224,10 @@ function initialize () {
     if (parsedURL.query.save) return
 
     // UI actions
-    // TODO: move them to ui-controller.js
+    // TODO: move actions to ui-controller.js
+
+    // setup controllers that exist during the whole life of the app
+    ui.init(gistID)
 
     document.querySelector('.hide-howto').addEventListener('click', function () {
       elementClass(howTo).add('hidden')
@@ -306,8 +308,7 @@ function initialize () {
       },
 
       share: function () {
-        elementClass(howTo).add('hidden')
-        elementClass(share).remove('hidden')
+        ui.showEmbed(gistID)
       },
 
       'show-forks': function () {
