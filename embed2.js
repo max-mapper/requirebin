@@ -22,22 +22,21 @@ function run () {
 }
 
 function updateUIBeforeGistLoad () {
-  // update the link to requirebin
-  document.getElementById('requirebin-link').href = 'http://requirebin.com/' + binURL
+  // update the links to requirebin
+  $('.requirebin-link').attr('href', 'http://requirebin.com/' + binURL)
 
-  // disable some tabs
+  // tabs state
   var tabs = (parsedURL.query.tabs || '')
     .split(',')
-    .filter(function (tok) { return !!tok })
+    .filter(Boolean)
   if (tabs.length) {
     $('#result-link').addClass('visible')
-  }
-  tabs.forEach(function (tab) {
-    $('#' + tab + '-link').addClass('visible')
-  })
-
-  // if no tab is enabled then plain mode is activated
-  if (!tabs.length) {
+    $('#nav').show()
+    tabs.forEach(function (tab) {
+      $('#' + tab + '-link').addClass('visible')
+    })
+  } else {
+    // if no tab is enabled then plain mode is activated
     $(document.body).addClass('plain')
   }
 }

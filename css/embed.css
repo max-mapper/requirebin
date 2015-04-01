@@ -29,6 +29,7 @@ code {
 
 /* top bar */
 #nav {
+  display: none;
   z-index: 1;
   padding: 10px;
   height: 30px;
@@ -54,6 +55,27 @@ code {
   width: 150px;
 }
 
+/* badge */
+#requirebin-badge {
+  position: absolute;
+  display: none;
+  top: -75px;
+  right: -75px;
+  width: 100px;
+  height: 100px;
+  z-index: 1;
+
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+#requirebin-badge:hover {
+  top: -15px;
+  right: -15px;
+}
+
 /* editors */
 #output {
   position: absolute;
@@ -68,9 +90,12 @@ code {
 }
 
 /* plain mode */
-body.plain #output {
+.plain #output {
   top: 0;
 }
-body.plain #nav {
+.plain #nav {
   display: none;
+}
+.plain #requirebin-badge {
+  display: block;
 }
