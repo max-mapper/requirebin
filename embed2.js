@@ -79,7 +79,7 @@ function render (content) {
 
   // disable default styling on the iframe
   if (content.head) {
-    content.head = '<style> html, body{ margin: 0; padding: 0; border: 0; }</style>' + content.head;
+    content.head = '<style> html, body{ margin: 0; padding: 0; border: 0; }</style>' + content.head
   }
 
   iframe({
