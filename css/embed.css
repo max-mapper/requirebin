@@ -1,0 +1,101 @@
+/* utils */
+html, body {
+  height: 100%;
+}
+.stretch {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+iframe {
+  position: absolute;
+}
+body {
+  font: 300 12px "Helvetica Neue", Helvetica, Arial;
+  overflow: hidden;
+}
+pre {
+  padding: 10px;
+  margin: 0;
+  border: none;
+  background-color: transparent;
+}
+code {
+  line-height: 14px;
+  font-size: 10px;
+}
+
+/* top bar */
+#nav {
+  display: none;
+  z-index: 1;
+  padding: 10px;
+  height: 30px;
+  border-bottom: 1px solid #eee;
+}
+#nav .btn {
+  display: none;
+  font-size: 12px;
+  padding: 5px 7px;
+}
+#nav .btn.visible {
+  display: inline-block;
+}
+.logo {
+  position: absolute;
+  right: 5px;
+  top: 10px;
+}
+.logo a {
+  text-decoration: none;
+}
+.logo img {
+  width: 150px;
+}
+
+/* badge */
+#requirebin-badge {
+  position: absolute;
+  display: none;
+  top: -75px;
+  right: -75px;
+  width: 100px;
+  height: 100px;
+  z-index: 1;
+
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+#requirebin-badge:hover {
+  top: -15px;
+  right: -15px;
+}
+
+/* editors */
+#output {
+  position: absolute;
+  top: 50px;
+  overflow: auto;
+}
+#output > div {
+  display: none;
+}
+#output > div.active {
+  display: block;
+}
+
+/* plain mode */
+.plain #output {
+  top: 0;
+}
+.plain #nav {
+  display: none;
+}
+.plain #requirebin-badge {
+  display: block;
+}
