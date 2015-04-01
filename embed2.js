@@ -3,6 +3,7 @@ var url = require('url')
 var iframe = require('iframe')
 var getGistFiles = require('./get-gist-files')
 var $ = window.jQuery
+var hljs = window.hljs
 var parsedURL = url.parse(window.location.href, true)
 var gistID = parsedURL.query.gist
 
@@ -15,12 +16,12 @@ if (gistID.indexOf('/') > -1) gistID = gistID.split('/')[1]
 
 run()
 
-function run() {
+function run () {
   updateUIBeforeGistLoad()
   loadFromAPI(gistID)
 }
 
-function updateUIBeforeGistLoad() {
+function updateUIBeforeGistLoad () {
   // update the link to requirebin
   document.getElementById('requirebin-link').href = 'http://requirebin.com/' + binURL
 
@@ -67,7 +68,6 @@ function loadFromAPI (gistID) {
 }
 
 function render (content) {
-
   if (!content.bundle || !content.meta) {
     content.bundle = 'document.write("not a valid requirebin gist - missing minified.js")'
   }
@@ -80,16 +80,16 @@ function render (content) {
   })
 }
 
-function updateUI(content) {
+function updateUI (content) {
   // highlight the code
   ['code', 'head', 'body', 'meta'].forEach(function (key) {
     var box = document.querySelector('#' + key + ' code')
     box.textContent = box.innerText = content[key]
   })
-  hljs.initHighlightingOnLoad();
+  hljs.initHighlightingOnLoad()
 }
 
-function setUpUIController(content) {
+function setUpUIController (content) {
   window.onpopstate = function () {
     var hash = location.hash.substr(1)
     if (content[hash] || hash === 'result') {
@@ -98,7 +98,7 @@ function setUpUIController(content) {
   }
 }
 
-function changeEditor(hash) {
+function changeEditor (hash) {
   $codeEls.removeClass('active')
   $links.removeClass('btn-primary')
   $('#' + hash).addClass('active')
