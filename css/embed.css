@@ -1,0 +1,65 @@
+/* utils */
+html, body {
+  height: 100%;
+}
+.stretch {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+iframe {
+  position: absolute;
+}
+body {
+  font: 300 12px "Helvetica Neue", Helvetica, Arial;
+}
+pre {
+  padding: 10px;
+  margin: 0;
+  border: none;
+  background-color: transparent;
+}
+code {
+  line-height: 14px;
+  font-size: 10px;
+}
+
+/* top bar */
+#nav {
+  padding: 10px;
+  height: 30px;
+  border-bottom: 1px solid #eee;
+}
+#nav .btn {
+  display: none;
+  font-size: 12px;
+  padding: 5px 7px;
+}
+#nav .btn.visible {
+  display: inline-block;
+}
+.logo {
+  position: absolute;
+  right: 5px;
+  top: 10px;
+}
+.logo a {
+  text-decoration: none;
+}
+.logo img {
+  width: 150px;
+}
+
+/* editors */
+#output > div {
+  display: none;
+}
+#output > div.active {
+  display: block;
+}
+#output {
+  position: absolute;
+  top: 50px;
+}
