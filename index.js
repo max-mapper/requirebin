@@ -68,7 +68,7 @@ function initialize () {
     request({url: authURL, json: true}, function (err, resp, data) {
       if (err) return console.error(err)
       console.log('auth response', resp, data)
-      if (data.token === 'undefined') return console.error('Auth failed to acquire token')
+      if (data.token === 'undefined' || !data.token) return console.error('Auth failed to acquire token')
       cookie.set('oauth-token', data.token)
       // Adjust URL
       var regex = new RegExp('\\?code=' + match[1])
