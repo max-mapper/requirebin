@@ -101,7 +101,7 @@ function updateUI (content) {
 
 function setUpUIController (content) {
   window.onpopstate = function () {
-    var hash = location.hash.substr(1)
+    var hash = window.location.hash.substr(1)
     if (content[hash] || hash === 'result') {
       changeEditor(hash)
     }

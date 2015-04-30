@@ -325,7 +325,7 @@ function initialize () {
       editors.all(function (editor) {
         editor.on('change', function () {
           var code = editor.editor.getValue()
-          localStorage.setItem(editor.name + 'Code', code)
+          window.localStorage.setItem(editor.name + 'Code', code)
         })
       })
 
