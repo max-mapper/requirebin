@@ -161,7 +161,7 @@ function initialize () {
 
     // remove the `disabled` class from the save button when any editor is updated
     editors.all(function (editor) {
-      editor.once('change', function (e) {
+      editor.on('change', function (e) {
         ui.$runButton.removeClass('disabled')
       })
     })
