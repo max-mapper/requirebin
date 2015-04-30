@@ -128,7 +128,8 @@ function initialize () {
   }
 
   ui.$spinner.show()
-  githubGist.getCodeFromGist(gistID, function (err, code) {
+  // if gistID is not set, fallback to specific queryParams, local storage
+  githubGist.getCode(gistID, function (err, code) {
     ui.$spinner.hide()
     if (err) return ui.tooltipMessage('error', JSON.stringify(err))
 
