@@ -337,6 +337,5 @@ function initialize () {
     setTimeout(function () {
       actions.play()
     }, 500)
-
   })
 }
