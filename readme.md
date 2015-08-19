@@ -14,7 +14,7 @@ the app itself is 100% client side (requirebin.com is hosted on github pages) bu
 
 both can be hosted anywhere, the instances used by requirebin.com are hosted on a linode VPS and nodejitsu, respectively.
 
-by default `config.js` is set to use `http://localhost:8000` as the browserify-cdn endpoint but feel free to use `http://wzrd.in` which is the one I host on a VPS (requires internet connection to use but )
+by default `config.js` is set to use `http://localhost:8000` as the browserify-cdn endpoint but feel free to use `http://wzrd.in` which is the one I host on a VPS (requires internet connection to use but hey)
 
 ## getting it to run locally
 
