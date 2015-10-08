@@ -261,7 +261,7 @@ body > pre { display: none }
   }
 }
 
-@media only screen and (max-width: 1150px) {
+@media only screen and (max-width: 1255px) {
   .tagline {
     display: none;
   }
