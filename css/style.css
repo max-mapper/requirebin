@@ -26,7 +26,7 @@ a { cursor: pointer; cursor: hand; }
 
 .cacheState { float: right; line-height: 52px; margin-right: 10px; font-size: 11px; }
 
-.dk_options, .actionsMenu { width: 190px; }
+.actionsMenu, .actionsMenu .dk_options { width: 190px; }
 
 .actionsMenu { float: right; margin: 5px 10px; }
 .actionsButtons { margin: 5px 0; float: right; }
