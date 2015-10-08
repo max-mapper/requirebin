@@ -26,7 +26,9 @@ a { cursor: pointer; cursor: hand; }
 
 .cacheState { float: right; line-height: 52px; margin-right: 10px; font-size: 11px; }
 
-.actionsMenu { width: 224px; float: right; margin: 5px 10px; }
+.actionsMenu, .actionsMenu .dk_options { width: 190px; }
+
+.actionsMenu { float: right; margin: 5px 10px; }
 .actionsButtons { margin: 5px 0; float: right; }
 .actionsButtons i { position: relative; top: 1px; }
 .actionsButtons .fui-new-16 { margin-right: 7px; }
@@ -259,7 +261,7 @@ body > pre { display: none }
   }
 }
 
-@media only screen and (max-width: 1150px) {
+@media only screen and (max-width: 1255px) {
   .tagline {
     display: none;
   }
