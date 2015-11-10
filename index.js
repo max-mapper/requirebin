@@ -121,7 +121,7 @@ function initialize () {
           newGistId = newGist.user.login + '/' + newGistId
         }
         ui.$spinner.hide()
-        if (err) ui.tooltipMessage('error', err.toString())
+        if (err) ui.showTooltipMessage('error', err.toString())
         if (newGistId) window.location.href = '/?gist=' + newGistId
       })
     })
@@ -131,7 +131,7 @@ function initialize () {
   // if gistID is not set, fallback to specific queryParams, local storage
   githubGist.getCode(gistID, function (err, code) {
     ui.$spinner.hide()
-    if (err) return ui.tooltipMessage('error', JSON.stringify(err))
+    if (err) return ui.showTooltipMessage('error', JSON.stringify(err))
 
     editors.init(code)
     editors.setActive('bundle')
@@ -220,7 +220,7 @@ function initialize () {
 
     sandbox.on('bundleError', function (err) {
       ui.$spinner.hide()
-      ui.tooltipMessage('error', 'Bundling error: \n\n' + err)
+      ui.showTooltipMessage('error', 'Bundling error: \n\n' + err)
     })
 
     if (parsedURL.query.save) return
