@@ -212,6 +212,7 @@ function initialize () {
 
     sandbox.on('bundleStart', function () {
       ui.$spinner.show()
+      ui.hideTooltipMessage()
     })
 
     sandbox.on('bundleEnd', function (bundle) {
