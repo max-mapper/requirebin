@@ -93,7 +93,7 @@ function initialize () {
       var minified
       try {
         minified = uglify.minify(bundle.script, {fromString: true, mangle: false, compress: false}).code
-      } catch () {
+      } catch (e) {
         minified = bundle.script
       }
 
