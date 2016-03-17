@@ -90,7 +90,12 @@ function initialize () {
 
     doBundle()
     sandbox.on('bundleEnd', function (bundle) {
-      var minified = uglify.minify(bundle.script, {fromString: true, mangle: false, compress: false})
+      var minified
+      try {
+        minified = uglify.minify(bundle.script, {fromString: true, mangle: false, compress: false}).code
+      } catch () {
+        minified = bundle.script
+      }
 
       var gist = {
         'description': 'requirebin sketch',
@@ -100,7 +105,7 @@ function initialize () {
             'content': entry
           },
           'minified.js': {
-            'content': minified.code
+            'content': minified
           },
           'requirebin.md': {
             'content': 'made with [requirebin](http://requirebin.com)'

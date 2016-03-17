@@ -54,7 +54,6 @@
     "extend": "^2.0.0",
     "gh-pages-deploy": "^0.3.0",
     "standard": "^5.0.0",
-    "uglify-js": "~2.4.12",
     "wzrd": "^1.3.1"
   }
 }
