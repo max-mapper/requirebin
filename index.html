@@ -14,7 +14,7 @@
   <body>
     <a href="/"><img class="logo" src="img/logo-black.png"></a>
     
-    <p class="tagline">Shareable JavaScript programs powered by <a href="http://npmjs.org" target="_blank"><span class="npm"></span></a> and <a href="http://browserify.org" target="_blank"><span class="browserify"></span></a></p>
+    <p class="tagline"> Powered by <a href="http://npmjs.org" target="_blank"><span class="npm"></span></a> and <a href="http://browserify.org" target="_blank"><span class="browserify"></span></a></p>
 
     <select class="actionsMenu" value="Actions" tabindex="1">
       <option value="noop" selected="selected">Actions</option>
@@ -23,6 +23,7 @@
       <option value="show-forks">Show Forks</option>
       <option value="howto">See instructions</option>
       <option value="share">Share/Embed</option>
+      <option value="github">View Source On GitHub</option>
     </select>
 
     <div class="actionsButtons">
@@ -102,8 +103,9 @@
     <div id="edit-body" class="require-bin-editor left hidden"></div>
     <div id="edit-bundle" class="require-bin-editor left"></div>
 
-<script id="bundle-template" type="text/template">// require() some stuff from npm (like you were using browserify)
-// and then hit Run Code to run it on the right
+<script id="bundle-template" type="text/template">// Welcome! require() some modules from npm (like you were using browserify)
+// and then hit Run Code to run your code on the right side.
+// Modules get downloaded from browserify-cdn and bundled in your browser.
 </script>
   <script type="text/javascript" src="flatui-deps.js"></script>
   <script type="text/javascript" src="bundle.js"></script>

@@ -313,6 +313,10 @@ function initialize () {
 
       'show-forks': function () {
         gistID && ui.showForks(githubGist.forks, githubGist.parent)
+      },
+      
+      'github': function () {
+        window.location.href = 'https://github.com/maxogden/requirebin'
       }
     }
 

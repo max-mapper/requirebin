@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "description": "create programs in the browser using modules from NPM",
   "scripts": {
-    "start": "beefy embed.js:embed-bundle.js index.js:bundle.js -p 5000",
+    "start": "wzrd embed.js:embed-bundle.js index.js:bundle.js -p 5000",
     "build": "browserify embed.js -o embed-bundle.js && browserify embed2.js -o embed-bundle-v2.js && browserify index.js -o bundle.js --debug",
     "minify": "cat bundle.js | uglifyjs -o bundle.js",
     "modifyconfig": "sed -i '.bak' 's/envs.dev/envs.production/' config.js && rm config.js.bak",
@@ -32,7 +32,7 @@
     "url": "git@github.com:maxogden/requirebin.git"
   },
   "dependencies": {
-    "browser-module-sandbox": "^1.4.0",
+    "browser-module-sandbox": "^1.4.3",
     "browser-request": "~0.3.1",
     "concat-stream": "1.0.0",
     "detective": "^4.3.1",
@@ -49,12 +49,12 @@
     "node": ">=0.8.x"
   },
   "devDependencies": {
-    "beefy": "~0.4.0",
-    "browserify": "~2.23.1",
+    "browserify": "^13.0.0",
     "codemirror": "^5.0.0",
     "extend": "^2.0.0",
     "gh-pages-deploy": "^0.3.0",
     "standard": "^5.0.0",
-    "uglify-js": "~2.4.12"
+    "uglify-js": "~2.4.12",
+    "wzrd": "^1.3.1"
   }
 }
