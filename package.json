@@ -40,7 +40,7 @@
     "github-api": "0.7.0",
     "github-oauth": "0.0.4",
     "iframe": "^0.3.1",
-    "javascript-editor": "~0.2.1",
+    "javascript-editor": "^1.0.3",
     "jsonp": "0.0.3",
     "keydown": "~0.0.3",
     "nets": "^1.0.0"
