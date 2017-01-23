@@ -9,7 +9,7 @@ create programs in the browser using modules from NPM
 the app itself is 100% client side (requirebin.com is hosted on github pages) but it relies on these three APIs:
 
 - https://github.com/substack/node-browserify
-- https://github.com/jesusabdullah/browserify-cdn
+- https://github.com/jfhbrook/wzrd.in
 - https://github.com/prose/gatekeeper (only necessary if you want to publish gists)
 
 both can be hosted anywhere, the instances used by requirebin.com are hosted on a linode VPS and nodejitsu, respectively.
